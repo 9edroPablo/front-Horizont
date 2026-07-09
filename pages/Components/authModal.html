@@ -1,0 +1,73 @@
+<div class="auth-background" id="auth-modal-overlay">
+    <div class="auth-card">
+        
+        <div class="auth-header">
+            <div class="header-top">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 18L12 4L22 18H2Z" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 11V18" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Horizon</span>
+                </div>
+                <button class="close-btn" id="close-auth-modal">&times;</button>
+            </div>
+            
+            <div class="header-text" id="header-text-login">
+                <h2>Bienvenido de vuelta</h2>
+                <p>La montaña te espera. Ingresa para continuar.</p>
+            </div>
+            <div class="header-text hidden" id="header-text-register">
+                <h2>Únete a la comunidad</h2>
+                <p>Regístrate gratis y comienza tu aventura hoy.</p>
+            </div>
+        </div>
+
+        <div class="auth-body">
+            <div class="auth-tabs-container">
+                <button id="tab-login" class="pill-btn active">Iniciar Sesión</button>
+                <button id="tab-register" class="pill-btn">Registrarse</button>
+            </div>
+
+            <form id="form-login" class="auth-form" novalidate>
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="tu@correo.com" class="form-input">
+                </div>
+                <div class="input-group password-group">
+                    <input type="password" id="login-password" placeholder="Contraseña" class="form-input">
+                    <span class="password-icon">👁️</span>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#">¿Olvidaste tu contraseña?</a>
+                </div>
+                
+                <button type="submit" class="btn-submit">Entrar a Horizon</button>
+            </form>
+
+            <form id="form-register" class="auth-form hidden" novalidate>
+                <div class="input-group">
+                    <input type="text" id="register-name" placeholder="Nombre completo" class="form-input">
+                </div>
+                <div class="input-group">
+                    <input type="email" id="register-email" placeholder="tu@correo.com" class="form-input">
+                </div>
+                <div class="input-group password-group">
+                    <input type="password" id="register-password" placeholder="Contraseña" class="form-input">
+                    <span class="password-icon">👁️</span>
+                </div>
+                <button type="submit" class="btn-submit">Crear mi cuenta</button>
+            </form>
+
+            <div class="auth-footer">
+                <div class="divider">
+                    <span>O CONTINÚA CON</span>
+                </div>
+                <button class="btn-google">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" width="18">
+                    Continuar con Google
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

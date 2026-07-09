@@ -1,0 +1,257 @@
+/* Fondo oscuro */
+.auth-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(17, 24, 39, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.auth-background.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Tarjeta Principal sin padding para que el header toque los bordes */
+.auth-card {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    overflow: hidden; /* Corta las esquinas del fondo verde */
+    font-family: 'Montserrat', sans-serif;
+}
+
+.auth-background.active .auth-card {
+    transform: translateY(0);
+}
+
+/* === ENCABEZADO VERDE === */
+.auth-header {
+    background-color: #0f5b46;
+    padding: 2rem 2rem 1.5rem 2rem;
+    color: #ffffff;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+.header-text h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.header-text p {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* === CUERPO Y PESTAÑAS === */
+.auth-body {
+    padding: 0 2rem 2rem 2rem;
+}
+
+.auth-tabs-container {
+    display: flex;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 99px;
+    margin-top: -1.2rem; /* Sube las pestañas para que monten el verde ligeramente si quieres, o déjalo en 1.5rem */
+    margin-bottom: 2rem;
+    padding: 4px;
+    position: relative;
+    z-index: 10;
+}
+
+.pill-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f5b46;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pill-btn.active {
+    background-color: #0f5b46;
+    color: #ffffff;
+}
+
+/* === FORMULARIOS === */
+.input-group {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    font-family: inherit;
+    color: #374151;
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.form-input:focus {
+    border-color: #0f5b46;
+}
+
+.password-group .password-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 1.2rem;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+    color: #0f5b46;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-submit {
+    width: 100%;
+    background-color: #0f5b46;
+    color: #ffffff;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 99px; /* Botón bien redondeado */
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #0a4333;
+}
+
+/* === SEPARADOR Y GOOGLE === */
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e5e7eb;
+    z-index: 1;
+}
+
+.divider span {
+    background-color: #ffffff;
+    padding: 0 10px;
+    color: #9ca3af;
+    font-size: 0.7rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-google {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 0.85rem;
+    border-radius: 99px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    transition: background-color 0.2s;
+}
+
+.btn-google:hover {
+    background-color: #f9fafb;
+}
+
+.hidden {
+    display: none !important;
+}
+/* === ESTADOS DE ERROR === */
+.form-input.error {
+    border-color: #ef4444; /* Rojo */
+    background-color: #fef2f2; /* Fondo rojizo muy sutil */
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+}

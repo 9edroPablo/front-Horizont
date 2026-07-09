@@ -1,0 +1,25 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Alex Montoya",
+            "email": "alex@horizon.com",
+            "password": "password123",
+            "avatar": "AM"
+        },
+        {
+            "id": 2,
+            "name": "Laura Perez",
+            "email": "laura@horizon.com",
+            "password": "mypassword",
+            "avatar": "LP"
+        },
+        {
+            "id": 3,
+            "name": "Pedro Pedrero",
+            "email": "pedropablo@gmail.com",
+            "password": "ppppedro",
+            "avatar": "PP"
+        }
+    ]
+}

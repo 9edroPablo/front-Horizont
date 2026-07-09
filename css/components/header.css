@@ -1,0 +1,64 @@
+/* Contenedor principal alineado a la derecha como en tu diseño */
+.main-header {
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: flex-end; 
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem; /* Espacio entre los textos y el botón verde */
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Enlaces base */
+.nav-link {
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px; /* Bordes redondeados tipo píldora */
+    transition: all 0.2s ease;
+}
+
+/* Estado Inactivo (Texto gris) */
+.nav-link {
+    color: #8a8a8a;
+}
+
+.nav-link:hover {
+    color: #2b8161;
+}
+
+/* Estado Activo (Fondo gris clarito, texto verde) */
+.nav-link.active {
+    background-color: #e5e7eb;
+    color: #2b8161;
+}
+
+/* Botón Verde de Iniciar Sesión */
+.btn-iniciar-sesion {
+    background-color: #2b8161;
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-iniciar-sesion:hover {
+    background-color: #1e6349; /* Verde un poco más oscuro al pasar el mouse */
+}

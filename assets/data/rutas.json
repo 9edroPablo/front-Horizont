@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "creador": "horizon",
+        "nombre": "Cañón del Sumidero",
+        "dificultad": "facil",
+        "deporte": "Kayak",
+        "lat": 16.8222,
+        "lng": -93.0784,
+        "descripcion": "Ruta de kayak por el majestuoso cañón."
+    },
+    {
+        "id": 2,
+        "creador": "horizon",
+        "nombre": "Volcán Tacaná",
+        "dificultad": "dificil",
+        "deporte": "Senderismo",
+        "lat": 15.1333,
+        "lng": -92.1000,
+        "descripcion": "Ascenso al pico más alto del sureste."
+    },
+    {
+        "id": 3,
+        "creador": "horizon",
+        "nombre": "Sima de las Cotorras",
+        "dificultad": "medio",
+        "deporte": "Escalada",
+        "lat": 16.8044,
+        "lng": -93.4735,
+        "descripcion": "Descenso y escalada en un hundimiento natural."
+    },
+    {
+        "id": 4,
+        "creador": "horizon",
+        "nombre": "Cascadas de Agua Azul",
+        "dificultad": "facil",
+        "deporte": "Senderismo",
+        "lat": 17.2544,
+        "lng": -92.1158,
+        "descripcion": "Caminata ligera y familiar por las cascadas turquesas."
+    },
+    {
+        "id": 5,
+        "creador": "horizon",
+        "nombre": "Boca del Cielo",
+        "dificultad": "medio",
+        "deporte": "Pesca",
+        "lat": 15.8458,
+        "lng": -93.6655,
+        "descripcion": "Pesca deportiva en mar abierto y estero."
+    }
+]

@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/components/header.css">
     <link rel="stylesheet" href="css/components/authModal.css">
     <link rel="stylesheet" href="css/inicio.css"> 
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <div id="componente-header"></div>
@@ -25,15 +27,12 @@
                     naturaleza y únete a una apasionada comunidad de ecoturismo.
                 </p>
                 
-               <!-- Barra de búsqueda -->
-                <div class="hero-search-box">
+               <div class="hero-search-box">
                     <span class="icon-location">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     </span>
-                    <!-- AGREGAMOS id="buscador-ciudad" -->
                     <input type="text" id="buscador-ciudad" class="search-input" placeholder="¿Dónde es tu próxima aventura?">
                     
-                    <!-- AGREGAMOS id="btn-buscar" -->
                     <button id="btn-buscar" class="btn-explorar">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         Explorar
@@ -42,18 +41,14 @@
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- SECCIÓN: MAPA INTERACTIVO                  -->
-        <!-- ========================================== -->
         <section class="mapa-section">
             <div class="mapa-header">
-                <h2>Mapa Interactivo de <span class="highlight-green">Rutas</span></h2>
+                <h2>Mapa de <span class="highlight-green">Rutas</span></h2>
                 <p>Encuentra tu próximo destino de ecoturismo. Filtra por tus deportes favoritos y explora rutas y puntos de encuentro verificados por usuarios.</p>
             </div>
 
             <div class="mapa-grid">
                 
-                <!-- Columna Izquierda: Filtros -->
                 <aside class="mapa-filtros">
                     <h3>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
@@ -63,7 +58,7 @@
                     <ul class="lista-filtros">
                         <li>
                             <label class="filtro-label">
-                                <input type="checkbox" checked>
+                                <input type="checkbox" class="filtro-deporte" value="Senderismo" checked>
                                 <span class="custom-checkbox"></span>
                                 Senderismo
                             </label>
@@ -71,7 +66,7 @@
                         </li>
                         <li>
                             <label class="filtro-label">
-                                <input type="checkbox">
+                                <input type="checkbox" class="filtro-deporte" value="Kayak" checked>
                                 <span class="custom-checkbox"></span>
                                 Kayak
                             </label>
@@ -79,7 +74,7 @@
                         </li>
                         <li>
                             <label class="filtro-label">
-                                <input type="checkbox" checked>
+                                <input type="checkbox" class="filtro-deporte" value="Escalada" checked>
                                 <span class="custom-checkbox"></span>
                                 Escalada
                             </label>
@@ -87,7 +82,7 @@
                         </li>
                         <li>
                             <label class="filtro-label">
-                                <input type="checkbox">
+                                <input type="checkbox" class="filtro-deporte" value="Pesca" checked>
                                 <span class="custom-checkbox"></span>
                                 Pesca
                             </label>
@@ -98,37 +93,37 @@
                     <div class="dificultad-section">
                         <h4>NIVEL DE DIFICULTAD</h4>
                         <div class="dificultad-botones">
-                            <button class="btn-dif active">Fácil</button>
-                            <button class="btn-dif">Medio</button>
-                            <button class="btn-dif">Difícil</button>
+                            <button class="btn-dif active" data-dificultad="todos">Todos</button>
+                            <button class="btn-dif" data-dificultad="facil">Fácil</button>
+                            <button class="btn-dif" data-dificultad="medio">Medio</button>
+                            <button class="btn-dif" data-dificultad="dificil">Difícil</button>
                         </div>
                     </div>
                 </aside>
 
-              <!-- Columna Derecha: El Mapa -->
-                <div class="mapa-display">
-                    <!-- Reemplazamos el placeholder por un mapa real embebido -->
-                    <iframe 
-                        id="mapa-iframe"
-                        width="100%" 
-                        height="100%" 
-                        style="border:0; min-height: 450px;" 
-                        loading="lazy" 
-                        allowfullscreen 
-                        referrerpolicy="no-referrer-when-downgrade"
-                        src="https://maps.google.com/maps?q=Mexico&output=embed">
-                    </iframe>
+              <div class="mapa-display">
+                    <div id="mapa-interactivo" style="width: 100%; height: 100%; min-height: 450px;"></div>
                 </div>
 
             </div>
         </section>
+        <section>
+            <h3>Próximas aventuras</h3>
+            <ul id="lista-rutas-recomendadas">
+                <!-- Aquí se agregarán las rutas recomendadas dinámicamente -->
+                 
+            </ul>
+        </section>
 
-        </main>
+    </main>
 
     <div id="componente-auth-modal"></div>
 
     <script type="module" src="js/components/loadHeader.js"></script>
     <script type="module" src="js/components/loadAuthModal.js"></script>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script src="js/inicio.js"></script>
 </body>
 </html>

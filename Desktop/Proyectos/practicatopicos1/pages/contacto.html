@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto e Informes | ITIID UPChiapas</title>
+   <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+   <header class="main-header">
+        <div class="container">
+            <img src="../assets/UPL2.png" alt="Logo ITIID UPChiapas" class="logo">
+            <h1>ITIID - UPChiapas</h1>
+            <nav class="main-nav">
+                <a href="index.html">Inicio</a>
+                <a href="noticias.html">Noticias</a>
+                <a href="plan-estudios.html" >Plan de Estudios</a>
+                <a href="contacto.html"class="active">Contacto</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="form-section">
+            <h2>Solicitar Información</h2>
+            <p>Déjanos tus datos y un asesor se pondrá en contacto contigo para resolver todas tus dudas sobre el proceso de admisión.</p>
+            
+            <form id="form-contacto" class="contact-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo:</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Ej. Juan Pérez">
+                </div>
+
+                <div class="form-group">
+                    <label for="preparatoria">Preparatoria de procedencia:</label>
+                    <input type="text" id="preparatoria" name="preparatoria" required placeholder="Ej. CBTis 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico:</label>
+                    <input type="email" id="correo" name="correo" required placeholder="juan.perez@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" name="telefono" required placeholder="961 123 4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="mensaje">¿Tienes alguna duda en específico?</label>
+                    <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Enviar Solicitud</button>
+            </form>
+            <div id="form-response" class="hidden-message"></div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 Universidad Politécnica de Chiapas.</p>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

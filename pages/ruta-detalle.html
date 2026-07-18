@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon - Detalle de Ruta</title>
+    
+    <!-- Hojas de estilo separadas -->
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/ruta-detalle.css">
+    
+    <!-- 1. AÑADIDO: CSS del Modal de Autenticación -->
+    <link rel="stylesheet" href="../css/components/authModal.css">
+</head>
+<body>
+    <!-- Header Inyectado -->
+    <div id="componente-header"></div>
+    
+    <main class="detalle-container">
+        <a href="actividades.html" class="btn-volver">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Volver a Explorar Rutas
+        </a>
+
+        <!-- Contenedor dinámico -->
+        <div id="contenido-dinamico">
+            <div class="mensaje-estado">
+                <h2>Cargando ruta...</h2>
+            </div>
+        </div>
+    </main>
+
+    <!-- 2. AÑADIDO: Contenedor vacío para el Modal -->
+    <div id="componente-auth-modal"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="../js/components/loadHeader.js"></script>
+    
+    <!-- 3. AÑADIDO: Script que inyecta la lógica del Modal -->
+    <script type="module" src="../js/components/loadAuthModal.js"></script>
+    
+    <script type="module" src="../js/ruta-detalle.js"></script>
+</body>
+</html>

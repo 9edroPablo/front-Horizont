@@ -1,0 +1,100 @@
+/* --- Contenedor de la cuadrícula --- */
+.rutas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    padding: 20px 0;
+}
+
+/* --- La Tarjeta --- */
+.ruta-card {
+    background: #ffffff;
+    border: 1px solid #E5E7EB;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.ruta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* --- Contenedor Imagen y Badges --- */
+.ruta-img-container {
+    position: relative;
+    height: 250px;
+}
+
+.ruta-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.badges-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+/* --- Contenido --- */
+.ruta-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.ruta-titulo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 10px;
+}
+
+.ruta-meta {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- Footer de la tarjeta (Precio y Disponibilidad) --- */
+.ruta-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #F3F4F6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.precio {
+    font-weight: 800;
+    color: #1F2937;
+    font-size: 18px;
+}
+
+.precio span { font-weight: 400; color: #6B7280; }
+
+.lugares-badge {
+    background: #E5E7EB;
+    color: #065F46;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}

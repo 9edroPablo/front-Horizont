@@ -1,3 +1,6 @@
+// 1. IMPORTACIÓN DEL COMPONENTE DE TARJETAS
+import { crearRutaCard } from './components/RutaCard.js';
+
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 1. INICIALIZACIÓN DEL MAPA
@@ -25,12 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 3. LÓGICA DE DATOS Y FILTROS
+    // 3. LÓGICA DE DATOS Y FILTROS DEL MAPA
     // ==========================================
     let todasLasRutas = []; // Guardaremos la base de datos completa aquí
     let dificultadActiva = 'todos'; // Estado por defecto
 
-    // Función que lee el JSON
+    // Función que lee el JSON del mapa
     const cargarRutas = async () => {
         try {
             const respuesta = await fetch('assets/data/rutas.json');
@@ -51,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Usamos nuestro pin personalizado en lugar del azul por defecto
             const pin = L.marker([ruta.lat, ruta.lng], { icon: pinPersonalizado }).addTo(capaPines);
             
-            // Damos formato al popup (agregamos una etiqueta de dificultad)
+            // Damos formato al popup
             pin.bindPopup(`
                 <strong style="color: #0F5B46; font-size: 16px;">${ruta.nombre}</strong><br>
                 <em>${ruta.deporte}</em> 
@@ -59,20 +62,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${ruta.dificultad}
                 </span><br>
                 <div style="margin-top: 5px;">${ruta.descripcion}</div>
-                <div style="margin-top: 5px;color: #0F5B46;">${ruta.creador}</div>
+                <div style="margin-top: 5px;color: #0F5B46;">${ruta.creador || ''}</div>
             `);
         });
     };
 
-    // Función maestra que decide qué se muestra según los botones seleccionados
+    // Función maestra que decide qué pines se muestran
     const aplicarFiltros = () => {
-        // 1. Obtenemos qué deportes están palomeados
         const checkboxes = document.querySelectorAll('.filtro-deporte');
         const deportesSeleccionados = Array.from(checkboxes)
                                            .filter(cb => cb.checked)
                                            .map(cb => cb.value);
 
-        // 2. Filtramos la base de datos maestra
         const rutasFiltradas = todasLasRutas.filter(ruta => {
             const coincideDeporte = deportesSeleccionados.includes(ruta.deporte);
             const coincideDificultad = (dificultadActiva === 'todos') || (ruta.dificultad === dificultadActiva);
@@ -80,37 +81,26 @@ document.addEventListener("DOMContentLoaded", () => {
             return coincideDeporte && coincideDificultad;
         });
 
-        // 3. Mandamos a dibujar solo las que pasaron el filtro
         renderizarPines(rutasFiltradas);
     };
 
     // ==========================================
     // 4. ESCUCHANDO CLICS EN LA INTERFAZ
     // ==========================================
-    
-    // Escuchar cambios en los Checkboxes de Deportes
     const checkboxesDeportes = document.querySelectorAll('.filtro-deporte');
     checkboxesDeportes.forEach(cb => {
         cb.addEventListener('change', aplicarFiltros);
     });
 
-    // Escuchar clics en los Botones de Dificultad
     const botonesDificultad = document.querySelectorAll('.btn-dif');
     botonesDificultad.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Quitamos la clase 'active' de todos los botones
             botonesDificultad.forEach(b => b.classList.remove('active'));
-            // Se la ponemos solo al que hicimos clic
             e.target.classList.add('active');
-            
-            // Actualizamos la variable de estado y volvemos a filtrar
             dificultadActiva = e.target.getAttribute('data-dificultad');
             aplicarFiltros();
         });
     });
-
-    // Iniciamos la carga de la base de datos
-    cargarRutas();
 
     // ==========================================
     // 5. LÓGICA DEL BUSCADOR DE CIUDADES
@@ -148,4 +138,29 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // ==========================================
+    // 6. RENDERIZADO DE PRÓXIMAS RUTAS GUIADAS
+    // ==========================================
+    const cargarEventos = async () => {
+        try {
+            const respuesta = await fetch('assets/data/eventos.json');
+            if (!respuesta.ok) {
+                throw new Error("No se pudo cargar el archivo de eventos");
+            }
+            
+            const eventos = await respuesta.json();
+            const contenedorRutas = document.getElementById('contenedor-rutas-guiadas');
+
+            if (contenedorRutas) {
+                contenedorRutas.innerHTML = eventos.map(ruta => crearRutaCard(ruta)).join('');
+            }
+        } catch (error) {
+            console.error("Error al renderizar los eventos:", error);
+        }
+    };
+
+    // Iniciamos la carga de ambas bases de datos
+    cargarRutas();
+    cargarEventos();
 });

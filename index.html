@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/components/header.css">
     <link rel="stylesheet" href="css/components/authModal.css">
     <link rel="stylesheet" href="css/inicio.css"> 
-    
+    <link rel="stylesheet" href="css/components/rutaCard.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
@@ -107,12 +107,21 @@
 
             </div>
         </section>
-        <section>
-            <h3>Próximas aventuras</h3>
-            <ul id="lista-rutas-recomendadas">
-                <!-- Aquí se agregarán las rutas recomendadas dinámicamente -->
-                 
-            </ul>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN: PRÓXIMAS RUTAS GUIADAS            -->
+        <!-- ========================================== -->
+        <section class="rutas-section">
+            <div class="rutas-header">
+                <div>
+                    <h2>Próximas <span class="highlight-orange">aventuras</span></h2>
+                    <p>Únete a guías locales certificados en nuestras próximas aventuras más populares. Conecta con entusiastas de la naturaleza con ideas afines.</p>
+                </div>
+                <a href="#" class="link-calendario">Ver calendario completo &rarr;</a>
+            </div>
+            
+            <!-- Aquí inyectaremos las tarjetas con JavaScript -->
+            <div id="contenedor-rutas-guiadas" class="rutas-grid"></div>
         </section>
 
     </main>
@@ -124,6 +133,7 @@
     
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <script src="js/inicio.js"></script>
+    <!-- AÑADIDO: type="module" para que acepte importaciones -->
+    <script type="module" src="js/inicio.js"></script>
 </body>
 </html>

@@ -1,0 +1,95 @@
+{
+    "guides": [
+        {
+            "id": 1,
+            "name": "Carlos Mendoza",
+            "email": "carlos@horizon.com",
+            "password": "password123",
+            "role": "guide",
+            "title": "GUÍA VERIFICADO HORIZON PRO",
+            "location": "Bogotá, Colombia - Andes & Patagonia",
+            "rating": 4.97,
+            "total_routes": 312,
+            "total_clients": 1840,
+            "years_exp": 8,
+            "cover_image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200",
+            "profile_image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200",
+            "bio": "Guía de alta montaña certificado UIAGM con 8 años liderando expediciones en los Andes colombianos, venezolanos y ecuatorianos. Biólogo de campo, especialista en flora andina y técnicas de orientación sin GPS. He llevado más de 312 grupos a cimas por encima de los 4.000 m de altitud.",
+            "certifications": [
+                "Wilderness First Responder (WFR)",
+                "Guía UIAGM - Alta Montaña",
+                "Instructor de Escalada - Nivel 4",
+                "Rescate en Alta Montaña",
+                "Primeros Auxilios Avanzados"
+            ],
+            "rutas_activas": [
+                {
+                    "titulo": "Senderismo en Grupo por la Cumbre",
+                    "deporte": "Senderismo",
+                    "lugar": "Parque Nacional Andes",
+                    "fecha": "Sáb, 15 Oct 2025",
+                    "horario": "07:00 - 6h",
+                    "inscritos": 8,
+                    "cupo_max": 10,
+                    "ganancia_estimada": 360,
+                    "porcentaje": 80,
+                    "estado": "Confirmada"
+                },
+                {
+                    "titulo": "Travesía Nocturna del Cañón",
+                    "deporte": "Senderismo",
+                    "lugar": "Cañón del Viento, Patagonia",
+                    "fecha": "Dom, 23 Oct 2025",
+                    "horario": "18:00 - 8h",
+                    "inscritos": 5,
+                    "cupo_max": 8,
+                    "ganancia_estimada": 475,
+                    "porcentaje": 63,
+                    "estado": "Inscripciones abiertas"
+                },
+                {
+                    "titulo": "Ruta Bosque Nublado",
+                    "deporte": "Senderismo",
+                    "lugar": "Reserva Biológica, Ecuador",
+                    "fecha": "Sáb, 28 Oct 2025",
+                    "horario": "08:00 - 4h",
+                    "inscritos": 10,
+                    "cupo_max": 10,
+                    "ganancia_estimada": 350,
+                    "porcentaje": 100,
+                    "estado": "Grupo completo"
+                }
+            ],
+            "ganancias": {
+                "mes_actual": 1185,
+                "rutas_completadas_mes": 3,
+                "total_cuatro_meses": 6510,
+                "proximas_ganancias": 1185,
+                "proximas_rutas_cant": 3
+            }, 
+            "resenas": [
+                {
+                    "cliente": "Elena Rodriguez",
+                    "ruta": "Senderismo en Grupo por la Cumbre",
+                    "fecha": "8 Oct 2025",
+                    "estrellas": 5,
+                    "comentario": "Carlos es un guía extraordinario. Tiene un conocimiento enciclopédico de la flora andina y nos mantuvo seguros en todo momento. La cumbre fue una experiencia que no olvidaré jamás."
+                },
+                {
+                    "cliente": "David Chen",
+                    "ruta": "Travesía Nocturna del Cañón",
+                    "fecha": "2 Oct 2025",
+                    "estrellas": 5,
+                    "comentario": "Nunca habría imaginado hacer una caminata nocturna. Carlos nos dio la confianza desde el primer momento. Ritmo perfecto, humor excelente y un manejo impecable del grupo. 10/10."
+                },
+                {
+                    "cliente": "María Fernández",
+                    "ruta": "Ruta Bosque Nublado",
+                    "fecha": "25 Sep 2025",
+                    "estrellas": 5,
+                    "comentario": "Llegué sin experiencia en senderismo y Carlos adaptó el ritmo perfectamente. El bosque nublado fue mágico. Las explicaciones sobre la biodiversidad fueron un plus inesperado."
+                }
+            ]
+        }
+    ]
+}

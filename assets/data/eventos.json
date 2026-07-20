@@ -1,0 +1,453 @@
+[
+    {
+        "id": 1,
+        "categoria": "Senderismo",
+        "dificultad": "Medio",
+        "titulo": "Senderismo en Grupo por la Cumbre",
+        "ubicacion": "Parque Nacional Andes",
+        "duracion": "6 Horas",
+        "calificacion": 4.9,
+        "resenas": 87,
+        "precio": 45,
+        "lugaresDisponibles": 4,
+        "imagen": "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Una ruta épica que atraviesa los valles más espectaculares del Parque Nacional Andes. Llegaremos a la cumbre del Pico del Águila (3,420 m) con vistas panorámicas de 360°. Ideal para quienes quieren un desafío moderado con un paisaje extraordinario.",
+        "guia": {
+        "nombre": "Carlos Mendoza",
+        "imagen": "../assets/img/guias/carlos.jpg",
+        "verificado": true,
+        "experiencia": "8 años de experiencia",
+        "calificacion": 4.97,
+        "rutas_guiadas": 312,
+        "bio": "Guía certificado de montaña y biólogo de campo..."
+        },
+        "itinerario": [
+            {
+                "hora": "07:00",
+                "titulo": "Punto de encuentro",
+                "descripcion": "Centro de Visitantes Portada Norte del parque. Distribución de equipamiento y briefing de seguridad."
+            },
+            {
+                "hora": "07:30",
+                "titulo": "Inicio del ascenso",
+                "descripcion": "Comienzo del sendero principal por el Valle del Cóndor. Terreno de tierra compacta, pendiente suave."
+            },
+            {
+                "hora": "12:30",
+                "titulo": "Cumbre - Pico del Águila",
+                "descripcion": "¡Llegada a la cima! Almuerzo incluido con vistas de 360° a toda la cordillera. 45 minutos en cumbre."
+            }
+        ],
+        "incluye": [
+            "Guía certificado bilingüe",
+            "Seguro de montaña",
+            "Bastones de trekking",
+            "Botiquín de primeros auxilios"
+        ],
+        "no_incluye": [
+            "Transporte al punto de encuentro",
+            "Equipo personal (botas, chubasquero)",
+            "Propina para el guía"
+        ]
+    },
+    {
+        "id": 2,
+        "categoria": "Kayak",
+        "dificultad": "Fácil",
+        "titulo": "Kayak de Mar al Amanecer",
+        "ubicacion": "Bahía Azul, Costa Norte",
+        "duracion": "3 Horas",
+        "calificacion": 4.9,
+        "resenas": 64,
+        "precio": 40,
+        "lugaresDisponibles": 8,
+        "imagen": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Despierta con el sol remando por las tranquilas aguas de Bahía Azul. Esta ruta es perfecta para principiantes y ofrece la oportunidad de observar la vida marina matutina, incluyendo delfines y aves costeras en su hábitat natural.",
+        "guia": {
+            "nombre": "Laura Marín",
+            "verificado": true,
+            "experiencia": "5 años de experiencia",
+            "calificacion": 4.85,
+            "rutas_guiadas": 210,
+            "bio": "Instructora de kayak certificada y amante del océano. Laura se especializa en rutas costeras y tiene un talento especial para encontrar las mejores zonas para avistamiento de fauna marina respetando su espacio."
+        },
+        "itinerario": [
+            {
+                "hora": "05:30",
+                "titulo": "Punto de encuentro",
+                "descripcion": "Muelle de Bahía Azul. Entrega de chalecos, remos y kayaks. Clase rápida de técnica básica de remo."
+            },
+            {
+                "hora": "06:00",
+                "titulo": "Zarpe y Amanecer",
+                "descripcion": "Salida hacia el mar abierto justo a tiempo para ver el sol salir por el horizonte. Sesión de fotos."
+            },
+            {
+                "hora": "08:30",
+                "titulo": "Regreso a la costa",
+                "descripcion": "Llegada al muelle y pequeño desayuno compartido en la playa para comentar la experiencia."
+            }
+        ],
+        "incluye": [
+            "Kayak (individual o doble)",
+            "Chaleco salvavidas",
+            "Bolsa estanca para el móvil",
+            "Desayuno ligero (café y fruta)"
+        ],
+        "no_incluye": [
+            "Traje de neopreno (opcional)",
+            "Toalla y ropa de cambio",
+            "Transporte a la bahía"
+        ]
+    },
+    {
+        "id": 3,
+        "categoria": "Kayak",
+        "dificultad": "Difícil",
+        "titulo": "Kayak en Río de Aguas Bravas",
+        "ubicacion": "Rápidos de Cristal",
+        "duracion": "4 Horas",
+        "calificacion": 4.8,
+        "resenas": 53,
+        "precio": 65,
+        "lugaresDisponibles": 2,
+        "imagen": "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Solo para aventureros con experiencia previa. Descenderemos por los rápidos de clase III y IV del Río Cristal. Una inyección de adrenalina pura rodeada de un denso cañón selvático que pondrá a prueba tu resistencia y reflejos.",
+        "guia": {
+            "nombre": "Mateo Rojas",
+            "verificado": true,
+            "experiencia": "12 años de experiencia",
+            "calificacion": 4.95,
+            "rutas_guiadas": 450,
+            "bio": "Ex-competidor olímpico de slalom en canoa. Mateo conoce cómo leer el río mejor que nadie y prioriza la máxima seguridad sin sacrificar la emoción de los rápidos."
+        },
+        "itinerario": [
+            {
+                "hora": "09:00",
+                "titulo": "Base del Río Cristal",
+                "descripcion": "Revisión exhaustiva de medidas de seguridad, señales de rescate y prueba de equipo en aguas tranquilas."
+            },
+            {
+                "hora": "10:00",
+                "titulo": "Entrada al Cañón del Diablo",
+                "descripcion": "Comienzo del descenso por el tramo más intenso del río, navegando rápidos de clase III y IV."
+            },
+            {
+                "hora": "13:00",
+                "titulo": "Salida y Transporte",
+                "descripcion": "Llegada a la zona de remanso. Las furgonetas nos esperan para regresar a la base inicial."
+            }
+        ],
+        "incluye": [
+            "Kayak de aguas bravas",
+            "Casco y chaleco de alto impacto",
+            "Traje de neopreno",
+            "Guía de rescate en kayak acompañante"
+        ],
+        "no_incluye": [
+            "Comida",
+            "Cámara deportiva (GoPro)",
+            "Seguro médico extremo (recomendado)"
+        ]
+    },
+    {
+        "id": 4,
+        "categoria": "Senderismo",
+        "dificultad": "Medio",
+        "titulo": "Ruta Bosque Nublado",
+        "ubicacion": "Reserva Biológica, Ecuador",
+        "duracion": "4 Horas",
+        "calificacion": 4.7,
+        "resenas": 48,
+        "precio": 35,
+        "lugaresDisponibles": 10,
+        "imagen": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Sumérgete en uno de los ecosistemas más biodiversos del planeta. Caminaremos entre niebla baja, orquídeas gigantes y helechos prehistóricos, con la oportunidad de avistar tucanes y colibríes únicos de la región ecuatorial.",
+        "guia": {
+            "nombre": "Elena Silva",
+            "verificado": true,
+            "experiencia": "6 años de experiencia",
+            "calificacion": 4.9,
+            "rutas_guiadas": 185,
+            "bio": "Bióloga especialista en botánica. Elena te enseñará a mirar más allá del paisaje general para descubrir los fascinantes micro-ecosistemas que esconde el bosque nublado."
+        },
+        "itinerario": [
+            {
+                "hora": "08:00",
+                "titulo": "Entrada a la Reserva",
+                "descripcion": "Registro en la reserva y charla sobre conservación y normas para no alterar a la fauna local."
+            },
+            {
+                "hora": "09:30",
+                "titulo": "Mirador de las Orquídeas",
+                "descripcion": "Parada en el corazón del bosque para observar flora endémica y escuchar los sonidos de la selva."
+            },
+            {
+                "hora": "12:00",
+                "titulo": "Cascada Escondida",
+                "descripcion": "Llegada al final del sendero donde nos espera una cascada de agua cristalina antes de regresar."
+            }
+        ],
+        "incluye": [
+            "Entrada a la Reserva Biológica",
+            "Guía naturalista",
+            "Poncho para la lluvia",
+            "Snacks locales"
+        ],
+        "no_incluye": [
+            "Transporte a la reserva",
+            "Botas de goma (disponibles para alquiler)",
+            "Almuerzo fuerte"
+        ]
+    },
+    {
+        "id": 5,
+        "categoria": "Escalada",
+        "dificultad": "Fácil",
+        "titulo": "Introducción a la Escalada en Roca",
+        "ubicacion": "Muros de Granito",
+        "duracion": "Día Completo",
+        "calificacion": 4.7,
+        "resenas": 41,
+        "precio": 85,
+        "lugaresDisponibles": 0,
+        "imagen": "https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Si siempre has querido intentar escalar en roca natural, este es el momento. Pasaremos el día en paredes de baja inclinación aprendiendo nudos, asegurar a tu compañero y técnicas básicas de movimiento en la roca.",
+        "guia": {
+            "nombre": "Diego Torres",
+            "verificado": true,
+            "experiencia": "10 años de experiencia",
+            "calificacion": 4.88,
+            "rutas_guiadas": 275,
+            "bio": "Diego es un instructor paciente y meticuloso con la seguridad. Su pasión es ver a las personas superar sus miedos y llegar a la cima por primera vez."
+        },
+        "itinerario": [
+            {
+                "hora": "09:00",
+                "titulo": "Base de la pared",
+                "descripcion": "Clínica de material: arneses, cascos, cuerdas y dispositivos de aseguramiento. Práctica de nudos."
+            },
+            {
+                "hora": "11:00",
+                "titulo": "Primeros pegues",
+                "descripcion": "Escalada en 'Top Rope' (cuerda por arriba) en rutas de grado muy fácil. Mucha práctica y poco riesgo."
+            },
+            {
+                "hora": "14:00",
+                "titulo": "Almuerzo y escalada libre",
+                "descripcion": "Descanso para comer y oportunidad de repetir rutas o intentar una ligeramente más difícil."
+            }
+        ],
+        "incluye": [
+            "Arnés y casco certificado",
+            "Pies de gato (zapatos de escalada)",
+            "Cuerdas y material técnico",
+            "Seguro de accidentes deportivos"
+        ],
+        "no_incluye": [
+            "Comida y agua (traer suficiente)",
+            "Transporte",
+            "Ropa cómoda deportiva"
+        ]
+    },
+    {
+        "id": 6,
+        "categoria": "Escalada",
+        "dificultad": "Difícil",
+        "titulo": "Escalada Técnica en Pared Norte",
+        "ubicacion": "Parque El Chorro, Andalucía",
+        "duracion": "Día Completo",
+        "calificacion": 4.8,
+        "resenas": 36,
+        "precio": 110,
+        "lugaresDisponibles": 4,
+        "imagen": "https://images.unsplash.com/photo-1564769662533-4f00a87b4056?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Una ruta exigente de varios largos (multi-pitch) en la emblemática Pared Norte del Chorro. Requiere experiencia previa en escalada deportiva (grado 6a mínimo) y excelente condición física.",
+        "guia": {
+            "nombre": "Sofía Valdés",
+            "verificado": true,
+            "experiencia": "14 años de experiencia",
+            "calificacion": 4.98,
+            "rutas_guiadas": 150,
+            "bio": "Guía de Alta Montaña UIAGM. Sofía ha escalado en Yosemite, Patagonia y los Alpes. Especialista en paredes grandes y escalada tradicional."
+        },
+        "itinerario": [
+            {
+                "hora": "07:30",
+                "titulo": "Aproximación",
+                "descripcion": "Caminata de 45 minutos cuesta arriba hasta el pie de vía. Repaso del plan de escalada y sistema de comunicación."
+            },
+            {
+                "hora": "09:00",
+                "titulo": "Escalada (Largos 1 a 4)",
+                "descripcion": "Ascenso de los primeros 120 metros. Escalada sostenida y vertical en roca caliza de excelente calidad."
+            },
+            {
+                "hora": "15:00",
+                "titulo": "Cumbre y Rápel",
+                "descripcion": "Llegada a la repisa cimera. Inicio de la serie de rápeles (descensos por cuerda) para volver a la base."
+            }
+        ],
+        "incluye": [
+            "Guía UIAGM",
+            "Cuerdas dobles y material de protección (friends, fisureros)",
+            "Radios de comunicación",
+            "Seguro de rescate"
+        ],
+        "no_incluye": [
+            "Equipo personal (arnés, pies de gato, casco)",
+            "Mochila de ataque (pequeña)",
+            "Comida de pared (barritas, geles)"
+        ]
+    },
+    {
+        "id": 7,
+        "categoria": "Pesca",
+        "dificultad": "Fácil",
+        "titulo": "Pesca de Trucha en Lago Esmeralda",
+        "ubicacion": "Lago Esmeralda, Sierra Nevada",
+        "duracion": "5 Horas",
+        "calificacion": 4.5,
+        "resenas": 29,
+        "precio": 55,
+        "lugaresDisponibles": 6,
+        "imagen": "https://images.unsplash.com/photo-1508182314998-3bd49473002f?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Relájate en las orillas del impresionante Lago Esmeralda. Aprenderás las técnicas básicas de pesca a mosca y cucharilla para capturar las hermosas truchas arcoíris que habitan estas aguas frías de montaña.",
+        "guia": {
+            "nombre": "Roberto Gómez",
+            "verificado": true,
+            "experiencia": "20 años de experiencia",
+            "calificacion": 4.75,
+            "rutas_guiadas": 510,
+            "bio": "Pescador local que conoce cada rincón del lago. Roberto fomenta la pesca con muerte y sin muerte, enseñando siempre el respeto por el pez y su entorno."
+        },
+        "itinerario": [
+            {
+                "hora": "08:00",
+                "titulo": "Orilla del Lago",
+                "descripcion": "Preparación de cañas y breve clase sobre cómo lanzar la línea y elegir el señuelo adecuado según el clima."
+            },
+            {
+                "hora": "10:00",
+                "titulo": "Acción de pesca",
+                "descripcion": "Nos moveremos por distintos puntos calientes del lago probando suerte. Roberto asistirá en cada captura."
+            },
+            {
+                "hora": "13:00",
+                "titulo": "Preparación del almuerzo",
+                "descripcion": "(Opcional) Si hay capturas, Roberto enseñará cómo limpiar y preparar una trucha fresca al fuego."
+            }
+        ],
+        "incluye": [
+            "Caña de pescar y carrete",
+            "Caja de señuelos y moscas",
+            "Permiso de pesca local diario",
+            "Sillas de campo"
+        ],
+        "no_incluye": [
+            "Botas impermeables o vadeadores",
+            "Gafas polarizadas (muy recomendables)",
+            "Bebidas alcohólicas"
+        ]
+    },
+    {
+        "id": 8,
+        "categoria": "Pesca",
+        "dificultad": "Fácil",
+        "titulo": "Pesca Artesanal en Laguna del Cóndor",
+        "ubicacion": "Laguna del Cóndor, Perú",
+        "duracion": "6 Horas",
+        "calificacion": 4.5,
+        "resenas": 22,
+        "precio": 48,
+        "lugaresDisponibles": 5,
+        "imagen": "https://images.unsplash.com/photo-1544253909-bc3f7ea59dd1?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Una experiencia cultural y deportiva. Aprende las técnicas de pesca tradicionales que han usado las comunidades locales por generaciones a bordo de pequeñas balsas de totora en una laguna sagrada.",
+        "guia": {
+            "nombre": "Juanita Pérez",
+            "verificado": true,
+            "experiencia": "Toda la vida",
+            "calificacion": 4.9,
+            "rutas_guiadas": 120,
+            "bio": "Líder de la comunidad local. Juanita no solo te enseña a pescar, sino que comparte leyendas e historias sobre la laguna y la cosmovisión andina."
+        },
+        "itinerario": [
+            {
+                "hora": "07:00",
+                "titulo": "Bienvenida en la Comunidad",
+                "descripcion": "Mate de coca de bienvenida y recorrido por los talleres donde se fabrican las balsas y redes de pesca."
+            },
+            {
+                "hora": "08:30",
+                "titulo": "Embarque y Pesca",
+                "descripcion": "Navegación en las balsas tradicionales. Aprendizaje del uso de redes de mano y sedales artesanales."
+            },
+            {
+                "hora": "13:00",
+                "titulo": "Almuerzo Comunitario",
+                "descripcion": "Retorno a tierra. Disfrutaremos de una 'Pachamanca' tradicional y el pescado del día preparado por la comunidad."
+            }
+        ],
+        "incluye": [
+            "Paseo en balsa tradicional",
+            "Equipos de pesca artesanal",
+            "Almuerzo típico completo",
+            "Aporte directo a la comunidad local"
+        ],
+        "no_incluye": [
+            "Transporte desde la ciudad hasta la comunidad",
+            "Protector solar",
+            "Propinas"
+        ]
+    },
+    {
+        "id": 9,
+        "categoria": "Senderismo",
+        "dificultad": "Difícil",
+        "titulo": "Travesía Nocturna del Cañón",
+        "ubicacion": "Cañón del Viento, Patagonia",
+        "duracion": "8 Horas",
+        "calificacion": 5.0,
+        "resenas": 19,
+        "precio": 95,
+        "lugaresDisponibles": 3,
+        "imagen": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=600&auto=format&fit=crop",
+        "descripcion_larga": "Experimenta la inmensidad de la Patagonia bajo un cielo estrellado sin contaminación lumínica. Una caminata intensa que desafía los sentidos, guiados por la luz de la luna y linternas, atravesando uno de los cañones más ventosos del mundo.",
+        "guia": {
+            "nombre": "Andrés Silva",
+            "verificado": true,
+            "experiencia": "9 años de experiencia",
+            "calificacion": 5.0,
+            "rutas_guiadas": 85,
+            "bio": "Guía experto en supervivencia y orientación nocturna. Andrés es un apasionado de la astronomía y te enseñará a navegar por las estrellas de los cielos del hemisferio sur."
+        },
+        "itinerario": [
+            {
+                "hora": "20:00",
+                "titulo": "Atardecer en la Boca del Cañón",
+                "descripcion": "Veremos caer el sol mientras ajustamos el equipo de frío y preparamos las linternas frontales."
+            },
+            {
+                "hora": "23:00",
+                "titulo": "El Corazón del Viento",
+                "descripcion": "Tramo más duro de la caminata con fuertes ráfagas. Caminaremos en fila india siguiendo de cerca al guía."
+            },
+            {
+                "hora": "02:00",
+                "titulo": "Observación Astronómica",
+                "descripcion": "Parada en un refugio rocoso natural. Bebidas calientes mientras Andrés explica las constelaciones visibles y la vía láctea."
+            }
+        ],
+        "incluye": [
+            "Guía de orientación nocturna",
+            "Linterna frontal de alta potencia",
+            "Termo con té caliente o café",
+            "Manta térmica de emergencia"
+        ],
+        "no_incluye": [
+            "Ropa térmica adecuada (obligatoria)",
+            "Calzado de trekking grueso",
+            "Transporte nocturno"
+        ]
+    }
+]

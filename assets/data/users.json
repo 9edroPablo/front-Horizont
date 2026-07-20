@@ -1,0 +1,74 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Alex Montoya",
+            "email": "alex@horizon.com",
+            "password": "password123",
+            "avatar": "AM",
+            "username": "@alex.montoya",
+            "location": "Bogotá, Colombia",
+            "cover_image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200",
+            "profile_image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200",
+            "stats": {
+                "rutas": 18,
+                "guias": 6,
+                "resenas": 12
+            },
+            "bio": "Amante de la montaña y el agua. Senderista de los fines de semana, kayakista ocasional, eterno aprendiz. Miembro de Horizon desde 2023.",
+            "badges": ["Cumbre x5", "Navegante", "Colaborador Top", "Eco-Guerrero"],
+            "reservas": [
+                {
+                    "titulo": "Senderismo en Grupo por la Cumbre",
+                    "tipo": "Senderismo",
+                    "precio": 45,
+                    "estado": "Confirmada",
+                    "fecha": "15 Oct 2025",
+                    "guia": "Carlos Mendoza"
+                },
+                {
+                    "titulo": "Kayak en Río de Aguas Bravas",
+                    "tipo": "Kayak",
+                    "precio": 65,
+                    "estado": "Pendiente",
+                    "fecha": "18 Oct 2025",
+                    "guia": "Sarah Jiménez"
+                }
+            ],
+            "historial": [
+                {
+                    "titulo": "Ruta Bosque Nublado",
+                    "tipo": "Senderismo",
+                    "fecha": "3 Sep 2025",
+                    "estado_resena": "Tu valoración"
+                },
+                {
+                    "titulo": "Kayak de Mar al Amanecer",
+                    "tipo": "Kayak",
+                    "fecha": "20 Ago 2025",
+                    "estado_resena": "Dejar reseña"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Laura Perez",
+            "email": "laura@horizon.com",
+            "password": "mypassword",
+            "avatar": "LP",
+            "username": "@laura.perez",
+            "location": "Madrid, España",
+            "stats": { "rutas": 5, "guias": 2, "resenas": 4 }
+        },
+        {
+            "id": 3,
+            "name": "Pedro Pedrero",
+            "email": "pedropablo@gmail.com",
+            "password": "ppppedro",
+            "avatar": "PP",
+            "username": "@pedro.p",
+            "location": "Santiago, Chile",
+            "stats": { "rutas": 2, "guias": 1, "resenas": 0 }
+        }
+    ]
+}

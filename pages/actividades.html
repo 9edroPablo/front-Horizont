@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon - Actividades</title>
+    
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/rutaCard.css">
+    
+    <!-- 1. AÑADIDO: CSS del Modal de Autenticación -->
+    <link rel="stylesheet" href="../css/components/authModal.css">
+    
+    <!-- Estilos específicos para esta página -->
+    <style>
+        .actividades-container {
+            max-width: 1200px;
+            margin: 120px auto 60px; /* Margen superior para no chocar con el nav */
+            padding: 0 20px;
+        }
+        .actividades-header {
+            margin-bottom: 40px;
+        }
+        .actividades-header h1 {
+            font-size: 32px;
+            color: #1F2937;
+            margin-bottom: 10px;
+        }
+        .actividades-header p {
+            color: #6B7280;
+            margin-bottom: 20px;
+        }
+        .buscador-wrap {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .buscador-wrap input {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: 1px solid #D1D5DB;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .btn-filtros {
+            padding: 0 20px;
+            background: #F3F4F6;
+            border: 1px solid #D1D5DB;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .grid-actividades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Se inyectará el Header aquí -->
+    <div id="componente-header"></div>
+    
+    <main class="actividades-container">
+        <div class="actividades-header">
+            <h1>Explorar Rutas</h1>
+            <p>9 aventuras verificadas. Filtra por deporte, dificultad o destino y encuentra tu próxima ruta.</p>
+            
+            <div class="buscador-wrap">
+                <input type="text" placeholder="Buscar por nombre o destino...">
+                <button class="btn-filtros">Filtros</button>
+            </div>
+            
+            <p style="font-weight: 600; color: #374151;">9 rutas encontradas</p>
+        </div>
+
+        <!-- Aquí inyectamos el componente reciclado -->
+        <div id="grid-todas-rutas" class="grid-actividades"></div>
+    </main>
+
+    <!-- 2. AÑADIDO: Contenedor vacío para el Modal -->
+    <div id="componente-auth-modal"></div>
+
+    <!-- Script de Header -->
+    <script type="module" src="../js/components/loadHeader.js"></script>
+    
+    <!-- 3. AÑADIDO: Script que inyecta la lógica del Modal -->
+    <script type="module" src="../js/components/loadAuthModal.js"></script>
+    
+    <!-- Script de esta página específica -->
+    <script type="module" src="../js/actividades.js"></script>
+</body>
+</html>

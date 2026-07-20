@@ -1,0 +1,362 @@
+/* ==========================================
+   ESTILOS DE LA PÁGINA DE INICIO (INDEX)
+========================================== */
+
+/* Contenedor principal del Banner */
+.hero-banner {
+    position: relative;
+    width: 100%;
+    min-height: 85vh; /* Ocupa el 85% de la altura de la pantalla */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* RUTA CORREGIDA HACIA TU IMAGEN */
+    background-image: url('../assets/images/fotoindex.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    text-align: center;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Capa semitransparente para oscurecer la foto y que el texto se lea bien */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+/* Contenido del texto (debe ir sobre el overlay) */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+/* Textos principales */
+.hero-marca {
+    font-size: 4rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+.hero-titulo {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #F97316; /* Color naranja de tu diseño */
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -1px;
+}
+
+.hero-descripcion {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    font-weight: 500;
+}
+
+/* Barra de búsqueda estilo "píldora" */
+.hero-search-box {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 8px;
+    border-radius: 99px; /* Bordes totalmente redondeados */
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.icon-location {
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    color: #374151;
+    background: transparent;
+    padding: 10px 0;
+}
+
+.search-input::placeholder {
+    color: #9CA3AF;
+}
+
+/* Botón verde de explorar */
+.btn-explorar {
+    display: flex;
+    align-items: center;
+    background-color: #0F5B46; /* Verde de tu marca */
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 99px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-explorar:hover {
+    background-color: #0c4a39;
+}
+/* ==========================================
+   SECCIÓN: MAPA INTERACTIVO
+========================================== */
+
+.mapa-section {
+    max-width: 1200px;
+    margin: 5rem auto;
+    padding: 0 20px;
+}
+
+.mapa-header {
+    max-width: 700px;
+    margin-bottom: 3rem;
+}
+
+.mapa-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.highlight-green {
+    color: #0F5B46; /* El verde de Horizon */
+}
+
+.mapa-header p {
+    font-size: 1.1rem;
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+/* Layout de Grid para separar Filtros del Mapa */
+.mapa-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+}
+
+/* -- Panel de Filtros (Izquierda) -- */
+.mapa-filtros {
+    background-color: white;
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid #F3F4F6;
+    height: fit-content;
+}
+
+.mapa-filtros h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+}
+
+.lista-filtros {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem 0;
+}
+
+.lista-filtros li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filtro-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #374151;
+    font-weight: 600;
+}
+
+/* Escondemos el checkbox original */
+.filtro-label input {
+    display: none;
+}
+
+/* Creamos nuestro propio círculo de check */
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #D1D5DB;
+    margin-right: 12px;
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.filtro-label input:checked + .custom-checkbox {
+    border-color: #0F5B46;
+    background-color: #0F5B46;
+}
+
+/* Palomita blanca del check */
+.filtro-label input:checked + .custom-checkbox::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.badge {
+    color: #6B7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Botones de Dificultad */
+.dificultad-section h4 {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #6B7280;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.dificultad-botones {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-dif {
+    flex: 1;
+    background: white;
+    border: 1px solid #D1D5DB;
+    padding: 8px 0;
+    border-radius: 99px;
+    color: #4B5563;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-dif.active, .btn-dif:hover {
+    background-color: #ECFDF5; /* Verde muy clarito */
+    color: #0F5B46;
+    border-color: #0F5B46;
+}
+
+/* -- Zona del Mapa (Derecha) -- */
+.mapa-display {
+    background-color: #F9FAFB;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    min-height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+.mapa-placeholder {
+    text-align: center;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+/* Responsive: si la pantalla es pequeña, se apilan */
+@media (max-width: 900px) {
+    .mapa-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* ==========================================
+   SECCIÓN: PRÓXIMAS RUTAS GUIADAS (CARDS)
+========================================== */
+
+.rutas-section {
+    max-width: 1200px;
+    margin: 5rem auto;
+    padding: 0 20px;
+}
+
+.rutas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    flex-wrap: wrap; /* Evita que se rompa en celulares */
+    gap: 1rem;
+}
+
+.rutas-header div {
+    max-width: 700px;
+}
+
+.rutas-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 1rem 0;
+}
+
+.highlight-orange {
+    color: #F97316; /* El naranja que usaste en el hero */
+}
+
+.rutas-header p {
+    font-size: 1.1rem;
+    color: #4B5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.link-calendario {
+    color: #0F5B46;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.link-calendario:hover {
+    color: #0c4a39;
+    text-decoration: underline;
+}
+
+/* ==========================================
+   LA MAGIA DEL GRID PARA ACOMODAR LAS CARDS
+========================================== */
+.rutas-grid {
+    display: grid;
+    /* auto-fit y minmax hacen que las tarjetas se adapten solas. 
+       Nunca serán más pequeñas que 320px, y rellenarán el espacio sobrante */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem; /* Espacio exacto entre las tarjetas */
+    width: 100%;
+}

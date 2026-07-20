@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon - Mi Perfil</title>
+    
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/authModal.css">
+    <link rel="stylesheet" href="../css/perfil.css">
+</head>
+<body>
+    <div id="componente-header"></div>
+    <div id="componente-auth-modal"></div>
+    
+    <main class="perfil-container">
+        <!-- Portada -->
+        <div class="perfil-cover" id="cover-img"></div>
+        
+        <!-- Cabecera del Perfil -->
+        <div class="perfil-header-card">
+            <div class="perfil-main-info">
+                <div class="avatar-wrapper">
+                    <img src="" alt="Avatar" id="user-avatar" class="avatar-img">
+                </div>
+                <div class="user-titles">
+                    <h1 id="user-name">Cargando...</h1>
+                    <p class="user-meta">
+                        <span id="user-handle"></span> • 
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span id="user-location"></span>
+                    </p>
+                </div>
+                <button class="btn-editar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                    Editar perfil
+                </button>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="perfil-stats">
+                <div class="stat-box">
+                    <h3 id="stat-rutas">0</h3>
+                    <p>Rutas</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="stat-guias">0</h3>
+                    <p>Guías</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="stat-resenas">0</h3>
+                    <p>Reseñas</p>
+                </div>
+            </div>
+
+            <!-- Biografía y Badges -->
+            <div class="perfil-bio">
+                <p id="user-bio"></p>
+                <div class="badges-container" id="user-badges"></div>
+            </div>
+        </div>
+
+        <!-- Sistema de Pestañas -->
+        <div class="perfil-tabs-section">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-target="tab-reservas">Reservas</button>
+                <button class="tab-btn" data-target="tab-historial">Historial</button>
+                <button class="tab-btn" data-target="tab-guardados">Guardados</button>
+                <button class="tab-btn" data-target="tab-configuracion">Configuración</button>
+            </div>
+
+            <!-- Contenido de las pestañas -->
+            <div class="tab-content active" id="tab-reservas">
+                <h3 class="tab-title">Próximas Reservas</h3>
+                <div id="lista-reservas"></div>
+                <button class="btn-ghost">+ Explorar más rutas</button>
+            </div>
+
+            <div class="tab-content" id="tab-historial">
+                <h3 class="tab-title">Rutas Completadas</h3>
+                <div id="lista-historial"></div>
+            </div>
+
+            <div class="tab-content" id="tab-guardados">
+                <div class="empty-state">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <h3>Sin rutas guardadas aún</h3>
+                    <p>Guarda rutas que te interesen para encontrarlas fácilmente.</p>
+                    <a href="actividades.html" class="btn-primary">Explorar rutas</a>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-configuracion">
+                <h3 class="tab-title">Configuración de cuenta</h3>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div>
+                            <h4>Editar información personal</h4>
+                            <p>Nombre, email, teléfono</p>
+                        </div>
+                        <span>></span>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <h4>Notificaciones</h4>
+                            <p>Gestiona tus alertas y recordatorios</p>
+                        </div>
+                        <span>></span>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <h4>Privacidad y seguridad</h4>
+                            <p>Contraseña, autenticación en dos pasos</p>
+                        </div>
+                        <span>></span>
+                    </div>
+                    <div class="setting-item">
+                        <div>
+                            <h4>Preferencias de actividad</h4>
+                            <p>Deportes, nivel, idioma</p>
+                        </div>
+                        <span>></span>
+                    </div>
+                    
+                    <!-- NUEVO: Opción de Cerrar Sesión -->
+                    <div class="setting-item logout-item" id="btn-cerrar-sesion">
+                        <div>
+                            <h4 class="text-danger">Cerrar sesión</h4>
+                            <p>Salir de tu cuenta de Horizon de forma segura</p>
+                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="../js/components/loadHeader.js"></script>
+    <script type="module" src="../js/components/loadAuthModal.js"></script>
+    <script type="module" src="../js/perfil.js"></script>
+</body>
+</html>

@@ -21,8 +21,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const respuesta = await fetch('../assets/data/users.json');
         const data = await respuesta.json();
         
-        // Simulamos que el usuario logueado es el primero (id: 1, Alex Montoya)
-        const usuario = data.users[0]; 
+        // Recuperamos el usuario de la sesión actual
+        const sessionActual = localStorage.getItem('horizon_user');
+        
+        // Si no hay sesión, lo devolvemos al inicio por seguridad
+        if (!sessionActual) {
+            window.location.href = '../index.html';
+            return; 
+        }
+
+        const usuarioLogueado = JSON.parse(sessionActual);
+
+        // Buscamos en el JSON al usuario que coincida con el email logueado
+        const usuario = data.users.find(u => u.email === usuarioLogueado.email);
+
+        // Si por alguna razón no existe en el JSON, mostramos un error
+        if (!usuario) {
+            console.error("Usuario no encontrado en la base de datos.");
+            return;
+        }
 
         // Poblar datos de cabecera
         document.getElementById('cover-img').style.backgroundImage = `url('${usuario.cover_image}')`;
@@ -73,5 +90,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Error cargando la información del perfil:", error);
+    }
+
+    // --- 3. LÓGICA DE CERRAR SESIÓN ---
+    const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener('click', () => {
+            // Eliminar la sesión del almacenamiento local
+            localStorage.removeItem('horizon_user');
+            
+            // Redireccionar al index
+            window.location.href = '../index.html';
+        });
     }
 });

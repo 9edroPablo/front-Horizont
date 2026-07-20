@@ -294,3 +294,69 @@
         grid-template-columns: 1fr;
     }
 }
+/* ==========================================
+   SECCIÓN: PRÓXIMAS RUTAS GUIADAS (CARDS)
+========================================== */
+
+.rutas-section {
+    max-width: 1200px;
+    margin: 5rem auto;
+    padding: 0 20px;
+}
+
+.rutas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    flex-wrap: wrap; /* Evita que se rompa en celulares */
+    gap: 1rem;
+}
+
+.rutas-header div {
+    max-width: 700px;
+}
+
+.rutas-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 1rem 0;
+}
+
+.highlight-orange {
+    color: #F97316; /* El naranja que usaste en el hero */
+}
+
+.rutas-header p {
+    font-size: 1.1rem;
+    color: #4B5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.link-calendario {
+    color: #0F5B46;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.link-calendario:hover {
+    color: #0c4a39;
+    text-decoration: underline;
+}
+
+/* ==========================================
+   LA MAGIA DEL GRID PARA ACOMODAR LAS CARDS
+========================================== */
+.rutas-grid {
+    display: grid;
+    /* auto-fit y minmax hacen que las tarjetas se adapten solas. 
+       Nunca serán más pequeñas que 320px, y rellenarán el espacio sobrante */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem; /* Espacio exacto entre las tarjetas */
+    width: 100%;
+}

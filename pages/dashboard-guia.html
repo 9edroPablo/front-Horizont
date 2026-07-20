@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon - Dashboard del Guía</title>
+    
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/authModal.css">
+    <link rel="stylesheet" href="../css/dashboard-guia.css">
+</head>
+<body>
+    <div id="componente-header"></div>
+    <div id="componente-auth-modal"></div>
+    
+    <main class="dashboard-container">
+        <!-- Portada superior -->
+        <div class="cover-photo" id="guide-cover">
+            <button class="btn-change-cover">Cambiar portada</button>
+        </div>
+        
+        <!-- Tarjeta principal de Identidad -->
+        <div class="identity-card">
+            <div class="identity-layout">
+                <div class="avatar-holder">
+                    <img src="" alt="Avatar Guía" id="guide-avatar">
+                </div>
+                <div class="identity-details">
+                    <span class="badge-pro" id="guide-badge-title"></span>
+                    <h1 id="guide-name">Cargando...</h1>
+                    <p class="guide-location" id="guide-location"></p>
+                    <div class="rating-row">
+                        <span class="stars">★★★★★</span>
+                        <span id="guide-rating-summary"></span>
+                    </div>
+                </div>
+                <div class="identity-actions">
+                    <button class="btn-secondary">Editar perfil público</button>
+                    <button class="btn-primary-green">Ver perfil público</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila de estadísticas clave -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <h3 id="stat-routes">0</h3>
+                <p>Rutas Guiadas</p>
+                <span>desde 2017</span>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-clients">0</h3>
+                <p>Clientes Atendidos</p>
+                <span>aventureros</span>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-rating">0</h3>
+                <p>Calificación Promedio</p>
+                <span>sobre 5.0 estrellas</span>
+            </div>
+            <div class="stat-card">
+                <h3 id="stat-years">0</h3>
+                <p>Años de Experiencia</p>
+                <span>en alta montaña</span>
+            </div>
+        </div>
+
+        <!-- Distribución del contenido bajo las estadísticas -->
+        <div class="content-split">
+            <!-- Columna Izquierda fija: Biografía y Certificados -->
+            <aside class="side-panel">
+                <div class="panel-box">
+                    <div class="box-header">
+                        <h3>Sobre este guía</h3>
+                        <button class="btn-icon-edit">✏️</button>
+                    </div>
+                    <p id="guide-bio"></p>
+                </div>
+                
+                <div class="panel-box">
+                    <h3>Certificaciones</h3>
+                    <ul class="cert-list" id="guide-certs"></ul>
+                </div>
+            </aside>
+
+            <!-- Columna Derecha dinámica: Sistema de Control por Pestañas -->
+            <section class="main-panel">
+                <nav class="tabs-navigation">
+                    <button class="tab-control active" data-tab="tab-rutas">Mis Rutas Activas</button>
+                    <button class="tab-control" data-tab="tab-calendario">Calendario</button>
+                    <button class="tab-control" data-tab="tab-resenas">Reseñas de Clientes</button>
+                    <button class="tab-control" data-tab="tab-ganancias">$ Ganancias</button>
+                </nav>
+
+                <!-- Contenidos de Pestañas -->
+                <div class="tab-wrapper active" id="tab-rutas">
+                    <div class="wrapper-header">
+                        <h3>Próximos Grupos a Guiar</h3>
+                        <button class="btn-add-route">+ Nueva ruta</button>
+                    </div>
+                    <div id="lista-rutas-activas" class="cards-stack"></div>
+                </div>
+
+                <div class="tab-wrapper" id="tab-calendario">
+                    <h3>Semana del 13-19 Oct 2025</h3>
+                    <div class="calendar-grid">
+                        <div class="calendar-day"><strong>LUN 13</strong><p>Preparación equipos</p></div>
+                        <div class="calendar-day"><strong>MAR 14</strong><p>Reunión previa</p></div>
+                        <div class="calendar-day event-day"><strong>MIÉ 15</strong><p>Senderismo Cumbre Grupo</p></div>
+                        <div class="calendar-day"><strong>JUE 16</strong><p>Descanso</p></div>
+                        <div class="calendar-day"><strong>VIE 17</strong><p>Revisión equipo</p></div>
+                        <div class="calendar-day"><strong>SÁB 18</strong><p>Libre</p></div>
+                        <div class="calendar-day"><strong>DOM 19</strong><p>Consulta clientes</p></div>
+                    </div>
+                </div>
+
+                <div class="tab-wrapper" id="tab-resenas">
+                    <div class="reviews-summary-box">
+                        <div class="global-score">
+                            <h2 id="review-score-big">4.97</h2>
+                            <p>Puntuación global</p>
+                            <span class="stars">★★★★★</span>
+                        </div>
+                        <div class="score-bars">
+                            <div class="bar-row"><span>5★</span><div class="bar"><div class="fill" style="width: 92%;"></div></div><span>92%</span></div>
+                            <div class="bar-row"><span>4★</span><div class="bar"><div class="fill" style="width: 6%;"></div></div><span>6%</span></div>
+                            <div class="bar-row"><span>3★</span><div class="bar"><div class="fill" style="width: 2%;"></div></div><span>2%</span></div>
+                        </div>
+                    </div>
+                    <div id="lista-resenas" class="reviews-stack"></div>
+                </div>
+
+                <div class="tab-wrapper" id="tab-ganancias">
+                    <h3>Resumen de Ganancias</h3>
+                    <div class="earnings-grid">
+                        <div class="earning-stat">
+                            <span class="label">GANADO ESTE MES (OCT)</span>
+                            <h2 id="earn-month">$0</h2>
+                            <p id="earn-month-sub">0 rutas completadas</p>
+                        </div>
+                        <div class="earning-stat">
+                            <span class="label">TOTAL ÚLTIMOS 4 MESES</span>
+                            <h2 id="earn-total">$0</h2>
+                            <p class="green-text">+18% vs período anterior</p>
+                        </div>
+                        <div class="earning-stat">
+                            <span class="label">PRÓXIMAS GANANCIAS</span>
+                            <h2 id="earn-future">$0</h2>
+                            <p id="earn-future-sub">de 0 rutas programadas</p>
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Desglose por ruta (próximos ingresos)</h4>
+                    <div id="lista-desglose-ganancias" class="earnings-breakdown-list"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="../js/components/loadHeader.js"></script>
+    <script type="module" src="../js/components/loadAuthModal.js"></script>
+    <script type="module" src="../js/dashboard-guia.js"></script>
+</body>
+</html>

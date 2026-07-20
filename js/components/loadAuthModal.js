@@ -110,7 +110,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     // Guardamos la sesión en el navegador
                     localStorage.setItem('horizon_user', JSON.stringify(resultado.user));
                     
-                    // Actualizamos el Header mágicamente usando la función global
+                    // === NUEVO: CONTROL DE REDIRECCIÓN SEGÚN EL ROL ===
+                    if (resultado.user.role === 'guide') {
+                        // Si es un guía, lo mandamos de inmediato a su Dashboard dedicado
+                        window.location.href = basePath + 'pages/dashboard-guia.html';
+                        return; // Detenemos la ejecución del resto del script de inicio
+                    }
+
+                    // Si es un usuario común, procedemos con la actualización dinámica en tiempo real
                     if (typeof window.actualizarHeaderUI === 'function') {
                         window.actualizarHeaderUI();
                     }

@@ -273,3 +273,19 @@
 
 .setting-item p { color: #6B7280; font-size: 14px; }
 .setting-item span { color: #9CA3AF; font-weight: bold; }
+
+.text-danger {
+    color: #DC2626 !important; /* Rojo de advertencia */
+}
+
+.logout-item {
+    border-top: 1px dashed #E5E7EB;
+    margin-top: 15px;
+    padding-top: 15px;
+    transition: background-color 0.2s ease;
+}
+
+.logout-item:hover {
+    background-color: #FEF2F2; /* Fondo sutil rojizo al pasar el mouse */
+    cursor: pointer;
+}

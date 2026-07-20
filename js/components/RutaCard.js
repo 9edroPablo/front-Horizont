@@ -2,7 +2,7 @@
 
 export const crearRutaCard = (ruta) => {
     return `
-    <a href="ruta-detalle.html?id=${ruta.id}" class="ruta-card">
+    <a href="/pages/ruta-detalle.html?id=${ruta.id}" class="ruta-card">
         <!-- Imagen y Etiquetas -->
         <div class="ruta-img-wrapper">
             <img src="${ruta.imagen}" alt="${ruta.titulo}">

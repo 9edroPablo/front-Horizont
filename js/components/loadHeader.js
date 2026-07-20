@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const esActividades = window.location.pathname.includes('actividades.html');
         const esPerfil = window.location.pathname.includes('perfil.html');
+        const esDashboardGuia = window.location.pathname.includes('dashboard-guia.html');
 
         if (isRoot) {
             const navInicio = document.getElementById('nav-inicio');
@@ -27,16 +28,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else if (esActividades) {
             const navActividades = document.getElementById('nav-actividades');
             if (navActividades) navActividades.classList.add('active');
-        } else if (esPerfil) {
+        } else if (esPerfil || esDashboardGuia) {
             const navPerfil = document.getElementById('nav-perfil');
             if (navPerfil) navPerfil.classList.add('active');
         }
 
         // ==========================================
-        // LÓGICA DE SESIÓN EN EL HEADER
-        // ==========================================
-        // ==========================================
-        // LÓGICA DE SESIÓN EN EL HEADER
+        // LÓGICA DE SESIÓN EN EL HEADER (CORREGIDA)
         // ==========================================
         const loggedOutState = document.getElementById('logged-out-state');
         const loggedInState = document.getElementById('logged-in-state');
@@ -45,25 +43,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             const currentUser = JSON.parse(localStorage.getItem('horizon_user'));
             
             if (currentUser) {
-                // 1. Ocultamos el botón de iniciar sesión
+                // 1. Ocultamos el estado de sesión cerrada
                 if (loggedOutState) {
                     loggedOutState.classList.add('hidden');
                     loggedOutState.style.display = 'none';
                 }
                 
-                // 2. Mostramos el perfil (quitando la clase hidden y forzando flex)
+                // 2. Mostramos el estado logueado
                 if (loggedInState) {
                     loggedInState.classList.remove('hidden');
                     loggedInState.style.display = 'flex';
                 }
                 
+                // === NUEVO: CONTROL DE ENLACES SEGÚN EL ROL ===
+                // Buscamos el contenedor o tag <a> que lleva al perfil dentro del estado logueado
+                const profileLink = loggedInState.closest('a') || loggedInState.querySelector('a');
+                if (profileLink) {
+                    if (currentUser.role === 'guide') {
+                        profileLink.href = basePath + 'pages/dashboard-guia.html';
+                    } else {
+                        profileLink.href = basePath + 'pages/perfil.html';
+                    }
+                }
+                
                 const userNameSpan = loggedInState.querySelector('.user-name');
-                const avatarSpan = loggedInState.querySelector('.avatar');
+                const avatarImg = loggedInState.querySelector('.avatar'); // Cambiado a img/selector correcto
                 
                 if (userNameSpan) userNameSpan.textContent = currentUser.name;
-                if (avatarSpan) avatarSpan.textContent = currentUser.avatar;
+                
+                // === SOLUCIÓN AL BUG VISUAL DEL TEXTO EXTRAÑO ===
+                if (avatarImg) {
+                    // Si el elemento es un <img> usamos .src, si es un contenedor con foto de fondo usamos style
+                    if (avatarImg.tagName === 'IMG') {
+                        avatarImg.src = currentUser.avatar;
+                    } else {
+                        avatarImg.style.backgroundImage = `url('${currentUser.avatar}')`;
+                        avatarImg.textContent = ''; // Limpiamos cualquier residuo de texto
+                    }
+                }
             } else {
-                // 3. Si no hay sesión, regresamos el botón y ocultamos el perfil
+                // 3. Si no hay sesión, restauramos estados por defecto
                 if (loggedOutState) {
                     loggedOutState.classList.remove('hidden');
                     loggedOutState.style.display = 'block';
@@ -80,13 +99,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Escuchador global para cualquier botón de cerrar sesión
         document.addEventListener('click', (e) => {
-            // Buscamos si el elemento clicado tiene el ID btn-cerrar-sesion
             if (e.target.closest('#btn-cerrar-sesion')) {
                 localStorage.removeItem('horizon_user'); 
                 actualizarHeader(); 
                 
-                // Si está en el perfil, lo mandamos al inicio
-                if (window.location.pathname.includes('perfil.html')) {
+                // Si está en áreas privadas, lo echamos al inicio
+                if (window.location.pathname.includes('perfil.html') || window.location.pathname.includes('dashboard-guia.html')) {
                     window.location.href = basePath + 'index.html';
                 }
             }

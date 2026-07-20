@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    
+
+    // --- 0. CONTROL DE ACCESO ---
+    // Si no hay sesión, o quien entra no es un guía, lo mandamos al inicio.
+    const sesion = JSON.parse(localStorage.getItem('horizon_user'));
+    if (!sesion || sesion.role !== 'guide') {
+        window.location.href = '../index.html';
+        return;
+    }
+
     // --- 1. CONFIGURACIÓN Y NAVEGACIÓN DE PESTAÑAS ---
     const controlesTab = document.querySelectorAll('.tab-control');
     const contenedoresTab = document.querySelectorAll('.tab-wrapper');
@@ -14,13 +22,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // --- 2. SOLICITUD Y CARGA DE DATOS ASÍNCRONOS ---
+    // --- 2. CERRAR SESIÓN ---
+    // Se registra ANTES de cargar los datos, para que el botón sirva
+    // aunque la carga de información falle.
+    const btnSalir = document.getElementById('btn-cerrar-sesion');
+    if (btnSalir) {
+        btnSalir.addEventListener('click', () => {
+            localStorage.removeItem('horizon_user');
+            window.location.href = '../index.html';
+        });
+    }
+
+    // --- 3. SOLICITUD Y CARGA DE DATOS ASÍNCRONOS ---
     try {
         const respuesta = await fetch('../assets/data/guides.json');
         if (!respuesta.ok) throw new Error("No se pudo mapear la base de guías");
-        
+
         const data = await respuesta.json();
-        
+
         // Simulamos la sesión iniciada del guía Carlos Mendoza (ID: 1)
         const guia = data.guides[0];
 
@@ -39,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('stat-years').textContent = guia.years_exp;
 
         // Biografía y Certificados Fijos
-        document.getElementById('guide-bio').textContent = $.bio || guia.bio;
+        document.getElementById('guide-bio').textContent = guia.bio;
         const listaCerts = document.getElementById('guide-certs');
         listaCerts.innerHTML = guia.certifications.map(cert => `<li>${cert}</li>`).join('');
 

@@ -1,18 +1,18 @@
-// Importamos nuestras utilidades
+// Utilidades de validación
 import { esEmailValido, mostrarError, limpiarError } from '../utils/validators.js';
 
-// === NUEVO: Importamos el servicio que lee el JSON ===
-import { loginUser } from '../api/authService.js';
+// Servicio que habla con el backend
+import { loginUser, registrarUser } from '../api/authService.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const isRoot = !window.location.pathname.includes('/pages/');
     const basePath = isRoot ? '' : '../';
-    const modalPath = basePath + 'pages/Components/authModal.html'; // Aseguré la ruta correcta a tu carpeta
+    const modalPath = basePath + 'pages/Components/authModal.html';
 
     try {
         const response = await fetch(modalPath);
         const html = await response.text();
-        
+
         const modalContainer = document.getElementById('componente-auth-modal');
         if (modalContainer) {
             modalContainer.innerHTML = html;
@@ -22,10 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const authOverlay = document.getElementById('auth-modal-overlay');
         const closeBtn = document.getElementById('close-auth-modal');
 
-        // Escuchador global ajustado para interceptar clics en cualquier botón de inicio de sesión
         document.addEventListener('click', (e) => {
-            const btnAbrir = e.target.closest('.btn-iniciar-sesion');
-            if (btnAbrir) {
+            if (e.target.closest('.btn-iniciar-sesion')) {
                 authOverlay.classList.add('active');
             }
         });
@@ -60,25 +58,57 @@ document.addEventListener("DOMContentLoaded", async () => {
             textLogin.classList.add('hidden');
         });
 
-        // === LÓGICA DE VALIDACIÓN (LOGIN) ===
-        
-        // Limpiar errores en cuanto el usuario empiece a escribir
-        const inputs = formLogin.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => limpiarError(input));
+        // Limpiar errores en cuanto el usuario empiece a escribir (ambos formularios)
+        [formLogin, formRegister].forEach(form => {
+            form.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => limpiarError(input));
+            });
         });
 
-        // Validar al dar clic en "Entrar a Horizon"
-        // === NUEVO: Agregamos "async" al evento submit ===
+        // Guarda la sesión y decide a dónde mandar al usuario
+        const iniciarSesionEnUI = (usuario, form) => {
+            localStorage.setItem('horizon_user', JSON.stringify(usuario));
+
+            if (usuario.role === 'guide') {
+                window.location.href = basePath + 'pages/dashboard-guia.html';
+                return;
+            }
+
+            if (typeof window.actualizarHeaderUI === 'function') {
+                window.actualizarHeaderUI();
+            }
+
+            authOverlay.classList.remove('active');
+            form.reset();
+        };
+
+        // Bloquea el botón mientras se espera al servidor
+        const conBotonCargando = async (form, texto, accion) => {
+            const btn = form.querySelector('.btn-submit');
+            const original = btn.textContent;
+            btn.textContent = texto;
+            btn.disabled = true;
+            try {
+                return await accion();
+            } finally {
+                btn.textContent = original;
+                btn.disabled = false;
+            }
+        };
+
+        // ==========================================
+        // INICIAR SESIÓN
+        // ==========================================
         formLogin.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Evitamos que la página se recargue
-            
-            let esValido = true;
+            e.preventDefault();
+
             const emailInput = document.getElementById('login-email');
             const passwordInput = document.getElementById('login-password');
 
-            // 1. Validar Correo
+            let esValido = true;
             const emailValor = emailInput.value.trim();
+            const passwordValor = passwordInput.value.trim();
+
             if (emailValor === '') {
                 mostrarError(emailInput, 'El correo es obligatorio.');
                 esValido = false;
@@ -87,52 +117,82 @@ document.addEventListener("DOMContentLoaded", async () => {
                 esValido = false;
             }
 
-            // 2. Validar Contraseña
-            const passwordValor = passwordInput.value.trim();
             if (passwordValor === '') {
                 mostrarError(passwordInput, 'La contraseña es obligatoria.');
                 esValido = false;
             }
 
-            // === NUEVO: Conexión con el JSON simulando el Backend ===
-            if (esValido) {
-                const btnSubmit = formLogin.querySelector('.btn-submit');
-                const textOriginal = btnSubmit.textContent;
-                
-                // Mostramos estado de carga
-                btnSubmit.textContent = 'Conectando...';
-                btnSubmit.disabled = true;
+            if (!esValido) return;
 
-                // Llamamos a nuestro servicio pasando los datos
-                const resultado = await loginUser(emailValor, passwordValor);
+            const resultado = await conBotonCargando(formLogin, 'Conectando...',
+                () => loginUser(emailValor, passwordValor));
 
-                if (resultado.success) {
-                    // Guardamos la sesión en el navegador
-                    localStorage.setItem('horizon_user', JSON.stringify(resultado.user));
-                    
-                    // === NUEVO: CONTROL DE REDIRECCIÓN SEGÚN EL ROL ===
-                    if (resultado.user.role === 'guide') {
-                        // Si es un guía, lo mandamos de inmediato a su Dashboard dedicado
-                        window.location.href = basePath + 'pages/dashboard-guia.html';
-                        return; // Detenemos la ejecución del resto del script de inicio
-                    }
+            if (resultado.success) {
+                iniciarSesionEnUI(resultado.user, formLogin);
+            } else {
+                mostrarError(passwordInput, resultado.message);
+            }
+        });
 
-                    // Si es un usuario común, procedemos con la actualización dinámica en tiempo real
-                    if (typeof window.actualizarHeaderUI === 'function') {
-                        window.actualizarHeaderUI();
-                    }
-                    
-                    // Cerramos el modal y limpiamos el formulario
-                    authOverlay.classList.remove('active');
-                    formLogin.reset();
-                } else {
-                    // Si falla (credenciales incorrectas), mostramos el error
-                    mostrarError(passwordInput, resultado.message);
+        // ==========================================
+        // REGISTRARSE
+        // ==========================================
+        formRegister.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nombreInput = document.getElementById('register-name');
+            const emailInput = document.getElementById('register-email');
+            const passwordInput = document.getElementById('register-password');
+
+            let esValido = true;
+            const nombreValor = nombreInput.value.trim();
+            const emailValor = emailInput.value.trim();
+            const passwordValor = passwordInput.value;
+
+            if (nombreValor === '') {
+                mostrarError(nombreInput, 'El nombre es obligatorio.');
+                esValido = false;
+            } else if (nombreValor.length < 3) {
+                mostrarError(nombreInput, 'Escribe tu nombre completo.');
+                esValido = false;
+            }
+
+            if (emailValor === '') {
+                mostrarError(emailInput, 'El correo es obligatorio.');
+                esValido = false;
+            } else if (!esEmailValido(emailValor)) {
+                mostrarError(emailInput, 'Ingresa un correo electrónico válido.');
+                esValido = false;
+            }
+
+            if (passwordValor === '') {
+                mostrarError(passwordInput, 'La contraseña es obligatoria.');
+                esValido = false;
+            } else if (passwordValor.length < 6) {
+                mostrarError(passwordInput, 'Mínimo 6 caracteres.');
+                esValido = false;
+            }
+
+            if (!esValido) return;
+
+            const resultado = await conBotonCargando(formRegister, 'Creando cuenta...', async () => {
+                const registro = await registrarUser({
+                    nombre: nombreValor,
+                    email: emailValor,
+                    password: passwordValor
+                });
+
+                // Si el registro salió bien, entramos automáticamente
+                if (registro.success) {
+                    return await loginUser(emailValor, passwordValor);
                 }
+                return registro;
+            });
 
-                // Restauramos el botón a su estado normal
-                btnSubmit.textContent = textOriginal;
-                btnSubmit.disabled = false;
+            if (resultado.success) {
+                iniciarSesionEnUI(resultado.user, formRegister);
+            } else {
+                mostrarError(emailInput, resultado.message);
             }
         });
 

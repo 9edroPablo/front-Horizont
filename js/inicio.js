@@ -1,5 +1,9 @@
-// 1. IMPORTACIÓN DEL COMPONENTE DE TARJETAS
+// js/inicio.js
+// Mapa interactivo y próximas rutas guiadas. Datos desde el backend.
+
 import { crearRutaCard } from './components/RutaCard.js';
+import { obtenerRutas } from './api/rutasService.js';
+import { obtenerEventos } from './api/eventosService.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
@@ -12,62 +16,53 @@ document.addEventListener("DOMContentLoaded", () => {
         maxZoom: 18
     }).addTo(mapa);
 
-    // Creamos una "Capa de Grupo". Esto nos permite borrar los pines viejos fácilmente al filtrar.
+    // Capa de grupo: nos permite borrar los pines viejos al filtrar.
     const capaPines = L.layerGroup().addTo(mapa);
 
     // ==========================================
     // 2. DISEÑO DEL PIN PERSONALIZADO
     // ==========================================
     const pinPersonalizado = L.divIcon({
-        className: 'custom-pin', // Clase CSS por si quieres animarlo después
-        // Aquí dibujamos un pin SVG con el color verde de tu marca (#0F5B46)
+        className: 'custom-pin',
         html: `<svg width="36" height="36" viewBox="0 0 24 24" fill="#0F5B46" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3" fill="#ffffff"></circle></svg>`,
         iconSize: [36, 36],
-        iconAnchor: [18, 36], // Punto exacto que toca el mapa (centro-abajo)
-        popupAnchor: [0, -32] // Donde sale el globo de texto
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -32]
     });
 
     // ==========================================
     // 3. LÓGICA DE DATOS Y FILTROS DEL MAPA
     // ==========================================
-    let todasLasRutas = []; // Guardaremos la base de datos completa aquí
-    let dificultadActiva = 'todos'; // Estado por defecto
+    let todasLasRutas = [];
+    let dificultadActiva = 'todos';
 
-    // Función que lee el JSON del mapa
     const cargarRutas = async () => {
         try {
-            const respuesta = await fetch('assets/data/rutas.json');
-            if (!respuesta.ok) throw new Error("Error al cargar JSON");
-            
-            todasLasRutas = await respuesta.json();
-            aplicarFiltros(); // Pintamos los pines por primera vez
+            todasLasRutas = await obtenerRutas();
+            aplicarFiltros();
         } catch (error) {
             console.error("Error cargando los pines:", error);
         }
     };
 
-    // Función que dibuja los pines en el mapa
     const renderizarPines = (rutasParaMostrar) => {
-        capaPines.clearLayers(); // Borramos los pines anteriores del mapa
+        capaPines.clearLayers();
 
         rutasParaMostrar.forEach(ruta => {
-            // Usamos nuestro pin personalizado en lugar del azul por defecto
             const pin = L.marker([ruta.lat, ruta.lng], { icon: pinPersonalizado }).addTo(capaPines);
-            
-            // Damos formato al popup
+
             pin.bindPopup(`
                 <strong style="color: #0F5B46; font-size: 16px;">${ruta.nombre}</strong><br>
-                <em>${ruta.deporte}</em> 
+                <em>${ruta.deporte}</em>
                 <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:11px; margin-left:5px; text-transform:uppercase;">
                     ${ruta.dificultad}
                 </span><br>
                 <div style="margin-top: 5px;">${ruta.descripcion}</div>
-                <div style="margin-top: 5px;color: #0F5B46;">${ruta.creador || ''}</div>
+                <div style="margin-top: 5px; color: #6B7280; font-size: 12px;">${ruta.ubicacion || ''}</div>
             `);
         });
     };
 
-    // Función maestra que decide qué pines se muestran
     const aplicarFiltros = () => {
         const checkboxes = document.querySelectorAll('.filtro-deporte');
         const deportesSeleccionados = Array.from(checkboxes)
@@ -77,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const rutasFiltradas = todasLasRutas.filter(ruta => {
             const coincideDeporte = deportesSeleccionados.includes(ruta.deporte);
             const coincideDificultad = (dificultadActiva === 'todos') || (ruta.dificultad === dificultadActiva);
-            
+
             return coincideDeporte && coincideDificultad;
         });
 
@@ -143,24 +138,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. RENDERIZADO DE PRÓXIMAS RUTAS GUIADAS
     // ==========================================
     const cargarEventos = async () => {
-        try {
-            const respuesta = await fetch('assets/data/eventos.json');
-            if (!respuesta.ok) {
-                throw new Error("No se pudo cargar el archivo de eventos");
-            }
-            
-            const eventos = await respuesta.json();
-            const contenedorRutas = document.getElementById('contenedor-rutas-guiadas');
+        const contenedorRutas = document.getElementById('contenedor-rutas-guiadas');
+        if (!contenedorRutas) return;
 
-            if (contenedorRutas) {
-                contenedorRutas.innerHTML = eventos.map(ruta => crearRutaCard(ruta)).join('');
-            }
+        try {
+            const eventos = await obtenerEventos();
+            // En la portada mostramos solo las próximas seis
+            contenedorRutas.innerHTML = eventos.slice(0, 6).map(crearRutaCard).join('');
         } catch (error) {
             console.error("Error al renderizar los eventos:", error);
+            contenedorRutas.innerHTML = `
+                <p style="padding: 20px; color: #B91C1C;">
+                    No se pudieron cargar las actividades.
+                    Revisa que el servidor esté encendido.
+                </p>`;
         }
     };
 
-    // Iniciamos la carga de ambas bases de datos
     cargarRutas();
     cargarEventos();
 });

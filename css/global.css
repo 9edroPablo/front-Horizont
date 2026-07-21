@@ -7,6 +7,14 @@
     box-sizing: border-box;
 }
 
+/* Sin esto, en sistemas con modo oscuro activado el navegador pinta los
+   <select>, calendarios y demás controles nativos con su tema oscuro
+   aunque el resto de la página sea clara — se ve como una barra negra
+   fea encima del formulario. Forzamos el sitio a tema claro siempre. */
+html {
+    color-scheme: light;
+}
+
 body {
     font-family: 'Montserrat', sans-serif;
     background-color: #f9fafb; /* Un gris muy clarito de fondo */

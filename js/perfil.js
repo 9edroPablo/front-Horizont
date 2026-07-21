@@ -7,7 +7,8 @@ import {
     componerReservas,
     esProxima,
     obtenerExplorador,
-    obtenerReservasExplorador
+    obtenerReservasExplorador,
+    cancelarReserva
 } from './api/reservasService.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         listaReservas.innerHTML = proximas.length === 0
             ? vacio('Todavía no tienes reservas próximas.')
             : proximas.map(res => `
-                <div class="list-item-card">
+                <div class="list-item-card" data-reserva="${res.id}">
                     <div class="item-main-info">
                         <h4>${res.titulo}</h4>
                         <p class="item-meta">
@@ -133,9 +134,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="item-actions">
                         <span class="item-price">$${res.precio.toLocaleString()}</span>
                         <span class="status-badge ${res.estado.toLowerCase()}">${res.estado}</span>
+                        <button class="btn-ghost btn-cancelar" style="margin:0;" data-id="${res.id}">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             `).join('');
+
+        // --- CANCELAR RESERVA ---
+        // Un solo listener delegado en el contenedor: los botones se
+        // regeneran al recargar la lista y así no hay que re-asignarlos.
+        listaReservas.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-cancelar');
+            if (!btn) return;
+
+            const idReserva = btn.dataset.id;
+            const tarjeta = btn.closest('.list-item-card');
+
+            if (!confirm('¿Seguro que quieres cancelar esta reserva? El lugar quedará libre para otra persona.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Cancelando...';
+
+            const resultado = await cancelarReserva(idReserva);
+
+            if (resultado.success) {
+                // La reserva pasa a CANCELADA: sale de "próximas" y
+                // aparecerá en el historial al recargar.
+                tarjeta.style.opacity = '0.5';
+                btn.textContent = 'Cancelada';
+                const badge = tarjeta.querySelector('.status-badge');
+                if (badge) {
+                    badge.textContent = 'CANCELADA';
+                    badge.className = 'status-badge cancelada';
+                }
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Cancelar';
+                alert(resultado.message);
+            }
+        });
 
         // --- HISTORIAL ---
         const historial = reservas.filter(r => !esProxima(r))

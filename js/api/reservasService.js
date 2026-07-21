@@ -150,3 +150,80 @@ export const obtenerGuiaPorUsuario = async (idUsuario) =>
 
 export const obtenerReservasGuia = async (idGuia) =>
     jsonSeguro(`${API_BASE}/reservas/guia/${idGuia}`, []);
+
+// ============================================================
+//  ACCIONES DE ESCRITURA
+// ============================================================
+
+// Cupos libres según el servidor. Se calcula allá con la misma regla
+// que valida la creación, así que lo que se muestra coincide con lo
+// que el backend va a aceptar.
+export const obtenerCupos = async (idActividad, esEvento = true) => {
+    const tipo = esEvento ? 'evento' : 'clase';
+    try {
+        const res = await fetch(`${API_BASE}/reservas/cupos/${tipo}/${idActividad}`);
+        if (!res.ok) return null;
+        const datos = await res.json();
+        return datos.disponibles;
+    } catch {
+        return null;
+    }
+};
+
+// Crea una reserva. El backend asigna fecha y estado PENDIENTE,
+// y rechaza con 400 si ya no hay cupo.
+export const crearReserva = async ({ idExplorador, idActividad, esEvento, precio }) => {
+    try {
+        const res = await fetch(`${API_BASE}/reservas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                idExplorador,
+                idEvento: esEvento ? idActividad : null,
+                idClase: esEvento ? null : idActividad,
+                precioReserva: precio
+            })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return {
+                success: false,
+                message: error.mensaje || 'No se pudo completar la reserva.'
+            };
+        }
+
+        return { success: true, reserva: await res.json() };
+
+    } catch {
+        return {
+            success: false,
+            message: 'No se pudo conectar con el servidor.'
+        };
+    }
+};
+
+// Cancela una reserva. No se borra: pasa a estado CANCELADA.
+export const cancelarReserva = async (idReserva) => {
+    try {
+        const res = await fetch(`${API_BASE}/reservas/${idReserva}/cancelar`, {
+            method: 'PUT'
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return {
+                success: false,
+                message: error.mensaje || 'No se pudo cancelar la reserva.'
+            };
+        }
+
+        return { success: true, reserva: await res.json() };
+
+    } catch {
+        return {
+            success: false,
+            message: 'No se pudo conectar con el servidor.'
+        };
+    }
+};

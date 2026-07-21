@@ -1,77 +1,126 @@
+// js/ruta-detalle.js
+// Detalle de una actividad. Compone la información de varios endpoints:
+//   evento -> zona (ubicación, dificultad, idGuia) -> guía -> usuario (nombre)
+
+import { API_BASE } from './api/config.js';
+import { obtenerEventoPorId } from './api/eventosService.js';
+import {
+    obtenerCupos,
+    crearReserva,
+    obtenerExplorador
+} from './api/reservasService.js';
+
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. Buscamos el ID en la URL y el contenedor donde inyectaremos todo
+
     const parametrosURL = new URLSearchParams(window.location.search);
     const rutaId = parseInt(parametrosURL.get('id'));
     const contenedor = document.getElementById('contenido-dinamico');
 
-    // 2. Si no hay ID en la URL, mostramos mensaje de error
-    if (!rutaId) {
+    const mostrarMensaje = (titulo, detalle = '') => {
         contenedor.innerHTML = `
             <div class="mensaje-estado">
-                <h2>Ruta no encontrada</h2>
+                <h2>${titulo}</h2>
+                ${detalle ? `<p style="color: #6B7280; font-size: 14px; margin-top: 10px;">${detalle}</p>` : ''}
                 <a href="actividades.html" class="enlace-volver">Volver a explorar</a>
             </div>
         `;
+    };
+
+    if (!rutaId) {
+        mostrarMensaje('Ruta no encontrada');
         return;
     }
 
-    // 3. Función principal para cargar la base de datos y pintar la interfaz
-    const cargarDetalleRuta = async () => {
+    // Trae la zona del evento. Si falla, seguimos sin ella.
+    const cargarZona = async (idZona) => {
         try {
-            // Hacemos la petición al JSON
-            const respuesta = await fetch('../assets/data/eventos.json');
-            
-            if (!respuesta.ok) {
-                throw new Error("No se pudo cargar el archivo JSON");
-            }
+            const res = await fetch(`${API_BASE}/rutas/${idZona}`);
+            if (!res.ok) return null;
+            return await res.json();
+        } catch {
+            return null;
+        }
+    };
 
-            const eventos = await respuesta.json();
-            
-            // Buscamos la ruta que coincida con el ID
-            const ruta = eventos.find(e => e.id === rutaId);
+    // Trae el perfil del guía y le pega el nombre, que vive en `usuario`.
+    const cargarGuia = async (idGuia) => {
+        if (!idGuia) return null;
+        try {
+            const res = await fetch(`${API_BASE}/guias/${idGuia}`);
+            if (!res.ok) return null;
+            const guia = await res.json();
 
-            if (!ruta) {
-                throw new Error("El ID no existe en la base de datos");
-            }
+            const resUsuario = await fetch(`${API_BASE}/usuarios/${guia.idUsuario}`);
+            const usuario = resUsuario.ok ? await resUsuario.json() : null;
 
-            // ==========================================
-            // PREPARAMOS LOS BLOQUES DE HTML DINÁMICOS
-            // ==========================================
-            
-            const htmlItinerario = ruta.itinerario.map(item => `
-                <div class="itinerario-item">
-                    <div class="iti-hora">${item.hora}</div>
-                    <div>
-                        <h4 class="iti-titulo">${item.titulo}</h4>
-                        <p class="iti-desc">${item.descripcion}</p>
+            return {
+                nombre: usuario ? usuario.nombre : 'Guía Horizon',
+                imagen: guia.fotoUrl || (usuario ? usuario.fotoUrl : null),
+                especialidad: guia.especialidad || '',
+                experiencia: guia.experienciaAnios
+                    ? `${guia.experienciaAnios} años de experiencia`
+                    : '',
+                bio: guia.descripcion || ''
+            };
+        } catch {
+            return null;
+        }
+    };
+
+    const bloqueGuia = (guia) => {
+        if (!guia) return '';
+
+        const foto = guia.imagen
+            || `https://ui-avatars.com/api/?name=${encodeURIComponent(guia.nombre)}&background=E5E7EB&color=374151&size=200`;
+
+        return `
+            <div class="guia-card-container">
+                <h2>Tu Guía</h2>
+                <div class="guia-perfil">
+                    <img src="${foto}" alt="Foto de ${guia.nombre}" class="guia-foto">
+                    <div class="guia-detalles">
+                        <div class="guia-info-header">
+                            <h3>${guia.nombre}</h3>
+                            <span class="badge-verificado">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                Verificado
+                            </span>
+                        </div>
+                        ${guia.especialidad ? `<p class="guia-experiencia">${guia.especialidad}${guia.experiencia ? ` • ${guia.experiencia}` : ''}</p>` : ''}
+                        ${guia.bio ? `<p class="guia-bio-texto">${guia.bio}</p>` : ''}
                     </div>
                 </div>
-            `).join('');
+            </div>
+        `;
+    };
 
-            const htmlIncluye = ruta.incluye.map(item => `
-                <li class="item-incluye">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    ${item}
-                </li>
-            `).join('');
+    const cargarDetalleRuta = async () => {
+        try {
+            const ruta = await obtenerEventoPorId(rutaId);
 
-            const htmlNoIncluye = ruta.no_incluye.map(item => `
-                <li class="item-no-incluye">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    ${item}
-                </li>
-            `).join('');
+            if (!ruta) {
+                mostrarMensaje(
+                    'Esta actividad ya no está disponible',
+                    'Puede que haya sido cancelada. Revisa el catálogo para ver las actividades vigentes.'
+                );
+                return;
+            }
 
-            // ==========================================
-            // INYECTAMOS EL HTML PRINCIPAL
-            // ==========================================
-            
+            // La zona aporta ubicación y dificultad; el guía viene de ella.
+            const zona = await cargarZona(ruta.idZona);
+            const guia = zona ? await cargarGuia(zona.idGuia) : null;
+
+            const ubicacion = zona ? zona.ubicacion : '';
+            const dificultad = zona ? (zona.nivelDificultad || '').toLowerCase() : '';
+            const descripcion = ruta.descripcion
+                || (zona ? zona.descripcion : '')
+                || 'Sin descripción disponible por el momento.';
+
             contenedor.innerHTML = `
                 <div class="hero-img-container">
                     <img src="${ruta.imagen}" alt="${ruta.titulo}">
                     <div class="hero-badge">
-                        ${ruta.categoria} • ${ruta.dificultad}
+                        ${ruta.categoria}${dificultad ? ` • ${dificultad}` : ''}
                     </div>
                 </div>
 
@@ -79,80 +128,30 @@ document.addEventListener("DOMContentLoaded", () => {
                     <!-- COLUMNA IZQUIERDA -->
                     <div class="info-principal">
                         <h1 class="ruta-titulo">${ruta.titulo}</h1>
-                        
+
                         <div class="ruta-meta">
+                            ${ubicacion ? `
                             <span class="meta-item">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                ${ruta.ubicacion}
-                            </span>
+                                ${ubicacion}
+                            </span>` : ''}
                             <span class="meta-item">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 ${ruta.duracion}
                             </span>
-                            <span class="meta-item meta-rating">
-                                ⭐ ${ruta.calificacion} (${ruta.resenas} reseñas)
-                            </span>
+                            ${ruta.fecha ? `
+                            <span class="meta-item">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                ${ruta.fecha}
+                            </span>` : ''}
                         </div>
 
                         <div class="seccion-detalle">
                             <h2>Sobre esta ruta</h2>
-                            <p class="descripcion-texto">${ruta.descripcion_larga}</p>
+                            <p class="descripcion-texto">${descripcion}</p>
                         </div>
 
-                        <!-- NUEVA TARJETA DE GUÍA -->
-                        <div class="guia-card-container">
-                            <h2>Tu Guía</h2>
-                            <div class="guia-perfil">
-                                <img src="${ruta.guia.imagen || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(ruta.guia.nombre) + '&background=E5E7EB&color=374151&size=200'}" alt="Foto de ${ruta.guia.nombre}" class="guia-foto">
-                                
-                                <div class="guia-detalles">
-                                    <div class="guia-info-header">
-                                        <h3>${ruta.guia.nombre}</h3>
-                                        ${ruta.guia.verificado ? `
-                                        <span class="badge-verificado">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                            Verificado
-                                        </span>` : ''}
-                                    </div>
-                                    <p class="guia-experiencia">${ruta.guia.experiencia}</p>
-                                    
-                                    <div class="guia-stats-grid">
-                                        <div class="stat-item">
-                                            <span class="stat-valor">${ruta.guia.calificacion}</span>
-                                            <span class="stat-label">Valoración</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-valor">${ruta.guia.rutas_guiadas}</span>
-                                            <span class="stat-label">Rutas guiadas</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <p class="guia-bio-texto">${ruta.guia.bio}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="seccion-detalle">
-                            <h2>Itinerario del día</h2>
-                            <div class="contenedor-itinerario">
-                                ${htmlItinerario}
-                            </div>
-                        </div>
-
-                        <div class="seccion-detalle sin-borde">
-                            <div class="lista-inclusiones">
-                                <h3>Incluye</h3>
-                                <ul class="lista-items">
-                                    ${htmlIncluye}
-                                </ul>
-                            </div>
-                            <div class="lista-inclusiones">
-                                <h3>No incluye</h3>
-                                <ul class="lista-items">
-                                    ${htmlNoIncluye}
-                                </ul>
-                            </div>
-                        </div>
+                        ${bloqueGuia(guia)}
                     </div>
 
                     <!-- COLUMNA DERECHA -->
@@ -162,13 +161,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <span class="reserva-precio">$${ruta.precio}</span>
                                 <span class="reserva-persona">/ persona</span>
                             </div>
-                            
+
                             <div class="reserva-detalles">
                                 <div class="reserva-fila">
                                     <span class="reserva-label">Lugares disponibles</span>
-                                    <span class="${ruta.lugaresDisponibles > 0 ? 'texto-verde' : 'texto-rojo'}">
-                                        ${ruta.lugaresDisponibles > 0 ? ruta.lugaresDisponibles : 'Agotado'}
-                                    </span>
+                                    <span id="cupos-valor" class="texto-gris">Consultando...</span>
+                                </div>
+                                <div class="reserva-fila">
+                                    <span class="reserva-label">Cupo del grupo</span>
+                                    <span class="texto-gris">${ruta.capacidad} personas</span>
                                 </div>
                                 <div class="reserva-fila">
                                     <span class="reserva-label">Seguro de actividad</span>
@@ -176,10 +177,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
 
-                            <button class="btn-reservar" ${ruta.lugaresDisponibles === 0 ? 'disabled' : ''}>
-                                ${ruta.lugaresDisponibles > 0 ? 'Reservar ahora' : 'Ruta Agotada'}
-                            </button>
-                            <p class="reserva-nota">
+                            <button class="btn-reservar" id="btn-reservar">Reservar ahora</button>
+                            <p class="reserva-nota" id="reserva-nota">
                                 Cancelación gratuita hasta 48h antes
                             </p>
                         </div>
@@ -187,17 +186,95 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
 
+            // --- CUPOS Y RESERVA ---
+            const btnReservar = document.getElementById('btn-reservar');
+            const cuposValor = document.getElementById('cupos-valor');
+            const nota = document.getElementById('reserva-nota');
+
+            const pintarCupos = (disponibles) => {
+                if (disponibles === null) {
+                    cuposValor.textContent = 'No disponible';
+                    return;
+                }
+                if (disponibles === 0) {
+                    cuposValor.textContent = 'Agotado';
+                    cuposValor.className = 'texto-rojo';
+                    btnReservar.textContent = 'Actividad agotada';
+                    btnReservar.disabled = true;
+                    return;
+                }
+                cuposValor.textContent = `${disponibles} ${disponibles === 1 ? 'lugar' : 'lugares'}`;
+                cuposValor.className = 'texto-verde';
+            };
+
+            let cupos = await obtenerCupos(rutaId, true);
+            pintarCupos(cupos);
+
+            btnReservar.addEventListener('click', async () => {
+                const sesion = JSON.parse(localStorage.getItem('horizon_user'));
+
+                if (!sesion) {
+                    nota.textContent = 'Inicia sesión para reservar esta actividad.';
+                    nota.className = 'reserva-nota texto-rojo';
+                    // Abre el modal de autenticación si está en la página
+                    const btnLogin = document.querySelector('.btn-iniciar-sesion');
+                    if (btnLogin) btnLogin.click();
+                    return;
+                }
+
+                if (sesion.role === 'guide') {
+                    nota.textContent = 'Las cuentas de guía no pueden reservar actividades.';
+                    nota.className = 'reserva-nota texto-rojo';
+                    return;
+                }
+
+                btnReservar.disabled = true;
+                btnReservar.textContent = 'Reservando...';
+
+                const explorador = await obtenerExplorador(sesion.id);
+
+                if (!explorador) {
+                    nota.textContent = 'Tu perfil de explorador no está disponible.';
+                    nota.className = 'reserva-nota texto-rojo';
+                    btnReservar.disabled = false;
+                    btnReservar.textContent = 'Reservar ahora';
+                    return;
+                }
+
+                const resultado = await crearReserva({
+                    idExplorador: explorador.idExplorador,
+                    idActividad: rutaId,
+                    esEvento: true,
+                    precio: ruta.precio
+                });
+
+                if (resultado.success) {
+                    btnReservar.textContent = '✓ Reserva registrada';
+                    nota.innerHTML = 'Tu reserva quedó <strong>pendiente</strong> de confirmación por el guía. ' +
+                                     'Puedes verla en <a href="perfil.html">tu perfil</a>.';
+                    nota.className = 'reserva-nota';
+
+                    // Refrescamos los cupos: acaba de ocuparse uno
+                    cupos = await obtenerCupos(rutaId, true);
+                    if (cupos !== null) {
+                        cuposValor.textContent = `${cupos} ${cupos === 1 ? 'lugar' : 'lugares'}`;
+                    }
+                } else {
+                    nota.textContent = resultado.message;
+                    nota.className = 'reserva-nota texto-rojo';
+                    btnReservar.disabled = false;
+                    btnReservar.textContent = 'Reservar ahora';
+                }
+            });
+
         } catch (error) {
             console.error("Error cargando detalle:", error);
-            contenedor.innerHTML = `
-                <div class="mensaje-estado">
-                    <h2>Ocurrió un error al cargar la ruta.</h2>
-                    <p style="color: #6B7280; font-size: 14px; margin-top: 10px;">Intenta volver a Explorar Rutas y selecciona otra vez la tarjeta.</p>
-                </div>
-            `;
+            mostrarMensaje(
+                'Ocurrió un error al cargar la ruta.',
+                'Revisa que el servidor esté encendido e intenta de nuevo.'
+            );
         }
     };
 
-    // 4. Ejecutamos la función
     cargarDetalleRuta();
 });

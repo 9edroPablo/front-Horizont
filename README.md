@@ -217,7 +217,6 @@ Acciones de escritura. Los botones existen en la interfaz pero todavía no persi
 
 - **Sin autenticación por token.** El login valida credenciales pero no emite JWT, y `SecurityConfig` permite todas las peticiones. Cualquiera puede consultar la API directamente. Es la deuda técnica más importante del proyecto.
 - **CORS abierto** a cualquier origen: válido en desarrollo, no en producción.
-- **El registro no crea el perfil extendido.** Solo inserta en `usuario`, no en `explorador`. Las cuentas creadas desde la interfaz muestran un perfil sin reservas hasta que se complete ese paso en el backend.
 - **Sin diseño responsive.** La interfaz está pensada para escritorio.
 - **Las certificaciones se listan sin nombre**, porque `documento_guia` guarda solo el tipo y una URL privada.
 

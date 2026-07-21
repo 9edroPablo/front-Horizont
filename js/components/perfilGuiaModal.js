@@ -84,7 +84,7 @@ export const editarPerfilGuia = (guia = {}) => {
 
                 <div class="pg-campo">
                     <label for="pg-especialidad">Especialidad</label>
-                    <input list="pg-especialidades" id="pg-especialidad"
+                    <input list="pg-especialidades" id="pg-especialidad" name="pg-especialidad-nofill" autocomplete="off"
                            placeholder="Ej. Alta montaña y senderismo"
                            value="${(guia.especialidad || '').replace(/"/g, '&quot;')}">
                     <datalist id="pg-especialidades">

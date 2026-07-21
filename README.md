@@ -1,6 +1,6 @@
 # Horizon — Frontend
 
-Plataforma web de ecoturismo para Chiapas: mapa interactivo de rutas, catálogo de actividades guiadas, perfiles de explorador y panel de guía.
+Plataforma web de ecoturismo para Chiapas: mapa interactivo de rutas, catálogo de actividades guiadas, reservas, reseñas, perfiles de explorador y panel de guía.
 
 Interfaz construida en **HTML, CSS y JavaScript vanilla** con módulos ES6, sin frameworks ni proceso de compilación. Consume una API REST en Spring Boot respaldada por MySQL.
 
@@ -37,11 +37,14 @@ Los tres se necesitan para ejecutar el sistema completo.
 git clone https://github.com/carlosaalbertolazaro/Horizon_DB.git
 cd Horizon_DB
 
-mysql -u root -p < horizon_db_v4.sql      # esquema
-mysql -u root -p < horizon_seeds_v4.sql   # datos de prueba
+mysql -u root -p < horizon_migracion.sql               # esquema v5
+mysql -u root -p < horizon_migracion_v5_ubicacion.sql  # columna ubicacion
+mysql -u root -p < horizon_seeds_v4.sql                # datos de prueba
 ```
 
-El archivo de semillas termina imprimiendo un conteo por tabla. Debe mostrar 5 usuarios, 2 guías, 2 exploradores, 6 zonas, 6 eventos, 3 clases, 7 reservas y 4 reseñas.
+> **Ojo con los nombres.** `horizon_migracion.sql` es el esquema v5 completo, no una migración. `horizon_db_v4.sql` es la versión anterior y no debe usarse.
+
+El archivo de semillas termina imprimiendo un conteo por tabla: 5 usuarios, 2 guías, 2 exploradores, 6 zonas, 6 eventos, 3 clases, 7 reservas y 4 reseñas.
 
 Para reiniciar solo los datos sin tocar el esquema, vuelve a ejecutar el archivo de semillas: empieza limpiando las tablas.
 
@@ -101,9 +104,9 @@ Todas usan la contraseña **`password123`**.
 
 | Correo | Rol | Notas |
 |---|---|---|
-| `alex@horizon.com` | Explorador | Tiene 4 reservas y reseñas |
-| `laura@horizon.com` | Explorador | Tiene 3 reservas |
-| `carlos@horizon.com` | Guía | 3 zonas y 2 clases a su cargo |
+| `alex@horizon.com` | Explorador | 4 reservas, reseñas y favoritos |
+| `laura@horizon.com` | Explorador | 3 reservas |
+| `carlos@horizon.com` | Guía | 3 zonas, 2 clases y reseñas recibidas |
 | `lucia@horizon.com` | Guía | 2 zonas y 1 clase |
 | `admin@horizon.com` | Admin | Sin panel propio todavía |
 
@@ -123,6 +126,7 @@ Las contraseñas se guardan con hash **BCrypt** (`$2a$`, 10 rondas). Si insertas
 │   └── Components/             Fragmentos inyectados (header, modal de auth)
 ├── css/
 │   ├── global.css              Variables y estilos base
+│   ├── responsive.css          Adaptación a móvil (se carga al final)
 │   └── components/             Estilos por componente
 ├── js/
 │   ├── api/                    ── Capa de comunicación con el backend ──
@@ -130,8 +134,18 @@ Las contraseñas se guardan con hash **BCrypt** (`$2a$`, 10 rondas). Si insertas
 │   │   ├── authService.js      Login y registro
 │   │   ├── rutasService.js     Zonas del mapa
 │   │   ├── eventosService.js   Actividades del catálogo
-│   │   └── reservasService.js  Reservas y composición de datos
-│   ├── components/             Header, modal, tarjeta de ruta
+│   │   ├── reservasService.js  Reservas, perfiles y actividades del guía
+│   │   └── favoritosService.js Actividades guardadas
+│   ├── components/
+│   │   ├── loadHeader.js          Header compartido y estado de sesión
+│   │   ├── loadAuthModal.js       Login y registro
+│   │   ├── RutaCard.js            Plantilla única de tarjeta
+│   │   ├── favoritos.js           Botón de guardar sobre las tarjetas
+│   │   ├── resenaModal.js         Calificar una actividad
+│   │   ├── perfilUsuarioModal.js  Editar perfil y contraseña
+│   │   ├── perfilGuiaModal.js     Editar perfil público del guía
+│   │   ├── actividadModal.js      Publicar evento o clase
+│   │   └── participantesModal.js  Confirmar o rechazar reservas
 │   ├── utils/validators.js     Validación de formularios
 │   └── *.js                    Un archivo por página
 └── assets/
@@ -147,26 +161,33 @@ Toda esa traducción vive en `js/api/`, en funciones adaptadoras. El resto del c
 
 `reservasService.js` hace además un trabajo de composición: el backend devuelve las reservas con puros IDs, sin el nombre de la actividad ni el del guía. Para mostrar *"Travesía en kayak · 15 Ago · Guía: Lucía"* hay que cruzar cinco tablas. En vez de una petición por reserva, `cargarCatalogos()` descarga los catálogos completos en paralelo y arma mapas en memoria; resolver cada reserva después es instantáneo.
 
+### Los modales
+
+Los formularios emergentes (`resenaModal`, `actividadModal`, `participantesModal`…) son componentes independientes que **inyectan sus propios estilos** y devuelven una promesa con los datos capturados. No conocen el backend: quien los llama decide qué hacer con el resultado. Eso permite reutilizarlos desde cualquier página sin tocar HTML ni CSS.
+
 ---
 
 ## Endpoints consumidos
 
 | Método | Ruta | Usado en |
 |---|---|---|
-| `POST` | `/api/auth/login` | Modal de autenticación |
-| `POST` | `/api/auth/registro` | Modal de autenticación |
-| `GET` | `/api/rutas` | Mapa, catálogo |
-| `GET` | `/api/rutas/{id}` | Detalle de ruta |
-| `GET` | `/api/eventos` | Catálogo, portada |
-| `GET` | `/api/eventos/{id}` | Detalle de ruta |
-| `GET` | `/api/clases` | Perfil, dashboard |
-| `GET` | `/api/usuarios`, `/api/usuarios/{id}` | Nombres de guías y clientes |
-| `GET` | `/api/guias/{id}`, `/api/guias/usuario/{id}` | Detalle de ruta, dashboard |
-| `GET` | `/api/exploradores/{id}`, `/api/exploradores/usuario/{id}` | Perfil, dashboard |
-| `GET` | `/api/reservas/explorador/{id}` | Perfil |
-| `GET` | `/api/reservas/guia/{id}` | Dashboard |
-| `GET` | `/api/resenas` | Perfil, dashboard |
-| `GET` | `/api/documentos-guia/guia/{id}` | Certificaciones del guía |
+| `POST` | `/api/auth/login`, `/api/auth/registro` | Modal de autenticación |
+| `GET` | `/api/rutas`, `/api/rutas/{id}` | Mapa, catálogo, detalle |
+| `GET` | `/api/eventos`, `/api/eventos/{id}` | Catálogo, portada, detalle |
+| `POST` | `/api/eventos`, `/api/clases` | Publicar actividad |
+| `GET` | `/api/clases` | Perfil, panel del guía |
+| `GET` | `/api/deportes` | Formulario de nueva actividad |
+| `GET`, `PUT` | `/api/usuarios/{id}` | Perfil |
+| `PUT` | `/api/usuarios/{id}/password` | Cambio de contraseña |
+| `GET`, `PUT` | `/api/guias/{id}`, `/api/guias/usuario/{id}` | Detalle, panel del guía |
+| `GET` | `/api/exploradores/{id}`, `/api/exploradores/usuario/{id}` | Perfil, participantes |
+| `PUT` | `/api/exploradores/{id}/nivel` | Perfil |
+| `GET`, `POST` | `/api/reservas`, `/api/reservas/explorador/{id}`, `/guia/{id}` | Reservar, perfil, panel |
+| `GET` | `/api/reservas/cupos/evento/{id}` | Lugares disponibles |
+| `PUT` | `/api/reservas/{id}/cancelar`, `/{id}/estado` | Cancelar, confirmar |
+| `GET`, `POST` | `/api/resenas` | Reseñas |
+| `GET`, `POST` | `/api/favoritos/usuario/{id}`, `/api/favoritos/alternar` | Guardados |
+| `GET` | `/api/documentos-guia/guia/{id}` | Certificaciones |
 
 ---
 
@@ -189,35 +210,50 @@ localStorage.removeItem('horizon_user'); location.href = '/index.html';
 
 ---
 
-## Estado actual
+## Funcionalidad
 
-### Funcionando contra la base de datos
+### Explorador
 
-- Inicio de sesión y registro, con contraseñas hasheadas
+- Registro e inicio de sesión
 - Mapa interactivo con filtros por deporte y dificultad
-- Catálogo de actividades con precio, duración y ubicación reales
-- Detalle de actividad, incluida la ficha del guía
-- Perfil del explorador: reservas, historial y estadísticas calculadas
-- Panel del guía: actividades, ocupación, reseñas y finanzas derivadas de las reservas
+- Catálogo de actividades con precio, duración y ubicación
+- Detalle de actividad con ficha del guía y lugares disponibles en tiempo real
+- **Reservar** una actividad, con validación de cupo en el servidor
+- **Cancelar** una reserva, lo que libera el lugar
+- **Calificar** una actividad completada, con estrellas y comentario
+- **Guardar** actividades en favoritos
+- Editar perfil, nivel de experiencia, localidad y contraseña
+
+### Guía
+
+- Registro seleccionando el rol
+- Panel con estadísticas calculadas de sus reservas: actividades guiadas, clientes atendidos y calificación promedio
+- **Publicar** una actividad nueva — evento en una de sus zonas, o clase con ubicación libre
+- **Ver participantes** de cada actividad y **confirmar o rechazar** reservas
+- Calendario semanal generado de sus actividades reales
+- Reseñas recibidas y desglose de ingresos
+- Editar su perfil público
+
+---
+
+## Estado del proyecto
 
 ### Pendiente
 
-Acciones de escritura. Los botones existen en la interfaz pero todavía no persisten cambios:
-
 | Función | Falta |
 |---|---|
-| Reservar una actividad | Validación de cupos y de la regla clase/evento en el backend |
-| Dejar una reseña | Interfaz de calificación (el endpoint ya existe) |
-| Editar perfil | `PUT /api/usuarios/{id}` |
-| Crear ruta o actividad | `POST /api/rutas` y `POST /api/eventos` |
-| Guardados / favoritos | Tabla en la base de datos |
-| Calendario del panel | Generarlo a partir de las actividades (hoy es estático) |
+| Subir fotos y documentos | No hay almacenamiento de archivos en el backend |
+| Editar o cancelar una actividad publicada | `PUT` y `DELETE` de evento y clase |
+| Página pública del guía | Vista sin autenticar de su perfil |
+| Notificaciones | Sin tabla ni sistema de avisos |
+| Preferencias de deportes e idiomas | Sin columnas en la base de datos |
 
 ### Limitaciones conocidas
 
-- **Sin autenticación por token.** El login valida credenciales pero no emite JWT, y `SecurityConfig` permite todas las peticiones. Cualquiera puede consultar la API directamente. Es la deuda técnica más importante del proyecto.
+- **Sin autenticación por token.** El login valida credenciales pero no emite JWT, y `SecurityConfig` permite todas las peticiones. Cualquiera puede consultar la API directamente o actuar en nombre de otro usuario. Es la deuda técnica más importante del proyecto.
 - **CORS abierto** a cualquier origen: válido en desarrollo, no en producción.
-- **Sin diseño responsive.** La interfaz está pensada para escritorio.
+- **Los archivos van por URL.** Las fotos de perfil y las imágenes de actividad se capturan como enlace, no se suben. Los formularios lo indican explícitamente.
+- **Criterio de cupos inconsistente.** Las vistas `vw_cupos_evento` y `vw_cupos_clase` del esquema cuentan solo reservas `CONFIRMADA`; el backend cuenta `PENDIENTE` + `CONFIRMADA`. Hoy no hay conflicto porque el backend no usa las vistas, pero es una decisión que el equipo debe unificar.
 - **Las certificaciones se listan sin nombre**, porque `documento_guia` guarda solo el tipo y una URL privada.
 
 ---
@@ -236,8 +272,14 @@ Hay otra instancia del backend corriendo. Ciérrala con `lsof -ti:8080 | xargs k
 **El login siempre devuelve 401**
 La contraseña en la base de datos está en texto plano en lugar de hasheada. Vuelve a ejecutar el archivo de semillas.
 
+**`Unknown column 'ubicacion'` al arrancar el backend**
+Falta aplicar `horizon_migracion_v5_ubicacion.sql`.
+
 **Las horas de las actividades salen desfasadas**
 Falta ajustar `serverTimezone` en `application.properties`.
+
+**La localidad del perfil aparece vacía tras actualizar**
+La localidad viaja en la sesión, que se arma al iniciar sesión. Cierra sesión y vuelve a entrar.
 
 **Quedaste atrapado en una página tras iniciar sesión**
 La sesión sobrevive al cierre del navegador. Bórrala desde la consola con `localStorage.removeItem('horizon_user')`.

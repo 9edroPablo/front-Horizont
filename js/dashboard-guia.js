@@ -10,9 +10,14 @@ import {
     formatearFecha,
     obtenerGuiaPorUsuario,
     obtenerReservasGuia,
-    actualizarGuia
+    actualizarGuia,
+    obtenerDeportes,
+    crearActividad,
+    actualizarEstadoReserva
 } from './api/reservasService.js';
 import { editarPerfilGuia } from './components/perfilGuiaModal.js';
+import { crearActividadModal } from './components/actividadModal.js';
+import { verParticipantes } from './components/participantesModal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -234,11 +239,220 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div class="group-actions">
                         <span class="estimated-value">${dinero(act.ingreso)} confirmado</span>
-                        <button class="btn-text-action">Ver lista de participantes</button>
-                        <button class="btn-text-action">Gestionar grupo</button>
+                        <button class="btn-text-action btn-participantes"
+                                data-id="${act.id}" data-tipo="${act.esEvento ? 'evento' : 'clase'}">
+                            Ver participantes${act.reservas.filter(r => r.estado === 'PENDIENTE').length > 0
+                                ? ` (${act.reservas.filter(r => r.estado === 'PENDIENTE').length} por revisar)`
+                                : ''}
+                        </button>
                     </div>
                 </div>
             `).join('');
+
+        // --- VER PARTICIPANTES Y GESTIONAR RESERVAS ---
+        contenedorRutas.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-participantes');
+            if (!btn) return;
+
+            const esEvento = btn.dataset.tipo === 'evento';
+            const idActividad = Number(btn.dataset.id);
+            const actividad = actividadesConDatos.find(a =>
+                a.esEvento === esEvento && a.id === idActividad);
+            if (!actividad) return;
+
+            btn.disabled = true;
+
+            // Los nombres viven en `usuario`, dos saltos más allá de la
+            // reserva; se resuelven en paralelo con la caché ya montada.
+            const inscritos = await Promise.all(actividad.reservas.map(async (r) => ({
+                idReserva: r.idReserva,
+                cliente: await nombreCliente(r.idExplorador, catalogos.usuarios),
+                precio: Number(r.precioReserva || 0),
+                estado: r.estado,
+                fecha: formatearFecha(r.fechaReserva)
+            })));
+
+            btn.disabled = false;
+
+            const huboCambios = await verParticipantes(
+                actividad,
+                inscritos,
+                (idReserva, estado) => actualizarEstadoReserva(idReserva, estado)
+            );
+
+            // Cambiar un estado altera cupos, ingresos y estadísticas:
+            // recargar es más fiable que recalcular a mano cada número.
+            if (huboCambios) window.location.reload();
+        });
+
+        // --- PUBLICAR UNA ACTIVIDAD NUEVA ---
+        const btnNueva = document.querySelector('.btn-add-route');
+        if (btnNueva) {
+            btnNueva.addEventListener('click', async () => {
+                const deportes = await obtenerDeportes();
+
+                const resultado = await crearActividadModal({
+                    zonas: misZonas.map(z => ({ id: z.id, nombre: z.nombre })),
+                    deportes
+                });
+                if (!resultado) return;
+
+                const { tipo, datos } = resultado;
+
+                // Cada tipo lleva sus propios campos: un evento se ancla a
+                // una zona, una clase al guía y a una ubicación libre.
+                const cuerpo = tipo === 'evento'
+                    ? {
+                        idDeporte: datos.idDeporte,
+                        idZona: datos.idZona,
+                        titulo: datos.titulo,
+                        descripcion: datos.descripcion,
+                        fecha: datos.fecha,
+                        duracion: datos.duracion,
+                        precio: datos.precio,
+                        capacidad: datos.capacidad,
+                        fotoUrl: datos.fotoUrl
+                    }
+                    : {
+                        idGuia: guia.idGuia,
+                        idDeporte: datos.idDeporte,
+                        titulo: datos.titulo,
+                        descripcion: datos.descripcion,
+                        ubicacion: datos.ubicacion,
+                        fecha: datos.fecha,
+                        duracion: datos.duracion,
+                        precio: datos.precio,
+                        capacidad: datos.capacidad,
+                        fotoUrl: datos.fotoUrl
+                    };
+
+                btnNueva.disabled = true;
+                btnNueva.textContent = 'Publicando...';
+
+                const respuesta = await crearActividad(tipo, cuerpo);
+
+                btnNueva.disabled = false;
+                btnNueva.textContent = '+ Nueva ruta';
+
+                if (respuesta.success) {
+                    window.location.reload();
+                } else {
+                    alert(respuesta.message);
+                }
+            });
+        }
+
+        // --- PESTAÑA: CALENDARIO ---
+        // Se genera a partir de las actividades reales del guía.
+        // La semana arranca en lunes, que es como se lee un calendario
+        // de trabajo, no en la fecha de hoy.
+        const DIAS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+        const MESES_CORTOS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                              'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        const renderCalendario = (offsetSemanas = 0) => {
+            const base = new Date();
+            base.setHours(0, 0, 0, 0);
+            // getDay(): 0 = domingo. Retrocedemos hasta el lunes.
+            const diasDesdeLunes = (base.getDay() + 6) % 7;
+            base.setDate(base.getDate() - diasDesdeLunes + (offsetSemanas * 7));
+
+            const dias = [];
+            for (let i = 0; i < 7; i++) {
+                const dia = new Date(base);
+                dia.setDate(base.getDate() + i);
+                dias.push(dia);
+            }
+
+            const mismoDia = (a, b) =>
+                a.getFullYear() === b.getFullYear() &&
+                a.getMonth() === b.getMonth() &&
+                a.getDate() === b.getDate();
+
+            const inicio = dias[0];
+            const fin = dias[6];
+            const titulo = inicio.getMonth() === fin.getMonth()
+                ? `Semana del ${inicio.getDate()}-${fin.getDate()} ${MESES_CORTOS[fin.getMonth()]} ${fin.getFullYear()}`
+                : `Semana del ${inicio.getDate()} ${MESES_CORTOS[inicio.getMonth()]} al ${fin.getDate()} ${MESES_CORTOS[fin.getMonth()]} ${fin.getFullYear()}`;
+
+            const celdas = dias.map(dia => {
+                const delDia = actividadesConDatos.filter(a =>
+                    a.fecha && mismoDia(new Date(a.fecha), dia));
+
+                const contenido = delDia.length > 0
+                    ? delDia.map(a => `<p><strong style="display:inline;">${a.titulo}</strong><br>${a.inscritos}/${a.capacidad} inscritos</p>`).join('')
+                    : '<p style="color:#D1D5DB;">Sin actividades</p>';
+
+                const esHoy = mismoDia(dia, new Date());
+
+                return `
+                    <div class="calendar-day ${delDia.length > 0 ? 'event-day' : ''}"
+                         ${esHoy ? 'style="box-shadow: 0 0 0 2px #F97316;"' : ''}>
+                        <strong>${DIAS[dia.getDay()]} ${dia.getDate()}</strong>
+                        ${contenido}
+                    </div>`;
+            }).join('');
+
+            const aviso = offsetSemanas === 0
+                ? ''
+                : `<p style="color:#6B7280; font-size:13px; margin-top:4px;">
+                       ${offsetSemanas > 0
+                           ? 'Tu próxima actividad programada está en esta semana.'
+                           : 'Estás viendo una semana pasada.'}
+                   </p>`;
+
+            const tab = document.getElementById('tab-calendario');
+            tab.innerHTML = `
+                <div class="box-header" style="margin-bottom:15px;">
+                    <div>
+                        <h3>${titulo}</h3>
+                        ${aviso}
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-text-action" data-semana="${offsetSemanas - 1}">‹ Anterior</button>
+                        <button class="btn-text-action" data-semana="0">Hoy</button>
+                        <button class="btn-text-action" data-semana="${offsetSemanas + 1}">Siguiente ›</button>
+                    </div>
+                </div>
+                <div class="calendar-grid">${celdas}</div>
+            `;
+
+            tab.querySelectorAll('[data-semana]').forEach(btn => {
+                btn.addEventListener('click', () =>
+                    renderCalendario(Number(btn.dataset.semana)));
+            });
+        };
+
+        // Abrir siempre en la semana actual dejaría el calendario vacío
+        // cuando las actividades están a semanas de distancia. Se arranca
+        // en la semana de la próxima actividad programada.
+        const semanaDeLaProximaActividad = () => {
+            const proxima = actividadesConDatos
+                .filter(a => a.fecha && new Date(a.fecha) >= new Date())
+                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))[0];
+
+            if (!proxima) return 0;
+
+            const lunesDe = (fecha) => {
+                const d = new Date(fecha);
+                d.setHours(0, 0, 0, 0);
+                d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+                return d;
+            };
+
+            const MS_POR_SEMANA = 7 * 24 * 60 * 60 * 1000;
+            const diferencia = lunesDe(proxima.fecha) - lunesDe(new Date());
+            return Math.round(diferencia / MS_POR_SEMANA);
+        };
+
+        renderCalendario(semanaDeLaProximaActividad());
+
+        // El lápiz junto a la biografía abre el mismo formulario que
+        // "Editar perfil público": es el mismo dato.
+        const btnLapiz = document.querySelector('.btn-icon-edit');
+        if (btnLapiz && btnEditar) {
+            btnLapiz.addEventListener('click', () => btnEditar.click());
+        }
 
         // --- PESTAÑA: RESEÑAS ---
         document.getElementById('review-score-big').textContent = promedioTexto;

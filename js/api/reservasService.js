@@ -340,3 +340,59 @@ export const cambiarPassword = async (idUsuario, passwordActual, passwordNueva) 
         return { success: false, message: 'No se pudo conectar con el servidor.' };
     }
 };
+
+// ============================================================
+//  ACTIVIDADES DEL GUÍA
+// ============================================================
+
+export const obtenerDeportes = async () => {
+    try {
+        const res = await fetch(`${API_BASE}/deportes`);
+        return res.ok ? await res.json() : [];
+    } catch {
+        return [];
+    }
+};
+
+// Publica un evento (ligado a una zona) o una clase (ubicación libre).
+export const crearActividad = async (tipo, datos) => {
+    const ruta = tipo === 'evento' ? 'eventos' : 'clases';
+    try {
+        const res = await fetch(`${API_BASE}/${ruta}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo publicar la actividad.' };
+        }
+
+        return { success: true, actividad: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};
+
+// Confirma o rechaza una reserva. Lo usa el guía desde su panel.
+export const actualizarEstadoReserva = async (idReserva, estado) => {
+    try {
+        const res = await fetch(`${API_BASE}/reservas/${idReserva}/estado`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo actualizar la reserva.' };
+        }
+
+        return { success: true, reserva: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};

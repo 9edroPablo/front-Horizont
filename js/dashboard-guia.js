@@ -13,11 +13,15 @@ import {
     actualizarGuia,
     obtenerDeportes,
     crearActividad,
-    actualizarEstadoReserva
+    actualizarEstadoReserva,
+    crearZona,
+    actualizarZona,
+    eliminarZona
 } from './api/reservasService.js';
 import { editarPerfilGuia } from './components/perfilGuiaModal.js';
 import { crearActividadModal } from './components/actividadModal.js';
 import { verParticipantes } from './components/participantesModal.js';
+import { editarZonaModal } from './components/zonaModal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -248,6 +252,130 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             `).join('');
+
+        // --- MIS ZONAS ---
+        // Una zona es el lugar; las actividades se programan dentro de ella.
+        // Sin zonas propias, el guía sólo puede publicar clases sueltas.
+        const cabeceraRutas = document.querySelector('#tab-rutas .wrapper-header');
+
+        const pintarZonas = () => {
+            let panel = document.getElementById('panel-zonas');
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'panel-zonas';
+                panel.style.marginBottom = '25px';
+                cabeceraRutas.insertAdjacentElement('afterend', panel);
+            }
+
+            panel.innerHTML = `
+                <div class="box-header" style="margin-bottom:10px;">
+                    <h4 style="font-size:15px; color:#374151;">Mis zonas (${misZonas.length})</h4>
+                    <button class="btn-text-action" id="btn-nueva-zona">+ Registrar zona</button>
+                </div>
+                ${misZonas.length === 0
+                    ? '<p style="color:#6B7280; font-size:13px;">Aún no tienes zonas registradas. Regístrala para poder programar eventos en ella.</p>'
+                    : `<div class="earnings-breakdown-list">
+                        ${misZonas.map(z => {
+                            // Una zona con eventos no se puede borrar: la llave
+                            // foránea lo impide. Se avisa antes de intentarlo.
+                            const eventosEnZona = [...catalogos.eventos.values()]
+                                .filter(e => e.idZona === z.id).length;
+
+                            return `
+                            <div class="breakdown-row">
+                                <span class="route-name">
+                                    📍 ${z.nombre} — ${z.ubicacion || 'sin referencia'}
+                                    ${eventosEnZona > 0
+                                        ? `<span style="color:#9CA3AF; font-size:12px;">· ${eventosEnZona} ${eventosEnZona === 1 ? 'evento' : 'eventos'}</span>`
+                                        : ''}
+                                </span>
+                                <span style="display:flex; gap:10px;">
+                                    <button class="btn-text-action btn-editar-zona" data-id="${z.id}">Editar</button>
+                                    <button class="btn-text-action btn-eliminar-zona" data-id="${z.id}"
+                                            data-nombre="${z.nombre.replace(/"/g, '&quot;')}"
+                                            data-eventos="${eventosEnZona}"
+                                            style="color:#B91C1C;">Eliminar</button>
+                                </span>
+                            </div>`;
+                        }).join('')}
+                       </div>`}
+            `;
+
+            document.getElementById('btn-nueva-zona')
+                    .addEventListener('click', () => abrirFormularioZona(null));
+
+            panel.querySelectorAll('.btn-editar-zona').forEach(btn => {
+                btn.addEventListener('click', () =>
+                    abrirFormularioZona(misZonas.find(z => z.id === Number(btn.dataset.id))));
+            });
+
+            panel.querySelectorAll('.btn-eliminar-zona').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const eventos = Number(btn.dataset.eventos);
+
+                    // Se corta aquí en vez de dejar que el servidor rechace:
+                    // el usuario se entera antes de confirmar algo imposible.
+                    if (eventos > 0) {
+                        alert(`No puedes eliminar "${btn.dataset.nombre}": tiene ${eventos} ` +
+                              `${eventos === 1 ? 'evento programado' : 'eventos programados'}. ` +
+                              `Elimina o reprograma esos eventos primero.`);
+                        return;
+                    }
+
+                    if (!confirm(`¿Eliminar la zona "${btn.dataset.nombre}"? Esta acción no se puede deshacer.`)) {
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    btn.textContent = 'Eliminando...';
+
+                    const respuesta = await eliminarZona(Number(btn.dataset.id), guia.idGuia);
+
+                    if (respuesta.success) {
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Eliminar';
+                        alert(respuesta.message);
+                    }
+                });
+            });
+        };
+
+        const abrirFormularioZona = async (zonaExistente) => {
+            const deportes = await obtenerDeportes();
+
+            const datos = await editarZonaModal({
+                zona: zonaExistente
+                    ? {
+                        id: zonaExistente.id,
+                        nombre: zonaExistente.nombre,
+                        ubicacion: zonaExistente.ubicacion,
+                        descripcion: zonaExistente.descripcion,
+                        idDeporte: zonaExistente.idDeporte,
+                        dificultad: zonaExistente.nivelDificultad,
+                        lat: zonaExistente.latitud !== null ? Number(zonaExistente.latitud) : null,
+                        lng: zonaExistente.longitud !== null ? Number(zonaExistente.longitud) : null
+                      }
+                    : {},
+                deportes
+            });
+            if (!datos) return;
+
+            const respuesta = zonaExistente
+                ? await actualizarZona(zonaExistente.id, guia.idGuia, datos)
+                : await crearZona(guia.idGuia, datos);
+
+            if (respuesta.success) {
+                // La zona nueva cambia el mapa, el selector de eventos y
+                // el listado: recargar es más fiable que parchear cada uno.
+                window.location.reload();
+            } else {
+                alert(respuesta.message);
+            }
+        };
+
+        pintarZonas();
 
         // --- VER PARTICIPANTES Y GESTIONAR RESERVAS ---
         contenedorRutas.addEventListener('click', async (e) => {

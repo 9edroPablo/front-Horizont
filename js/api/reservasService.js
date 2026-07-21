@@ -396,3 +396,70 @@ export const actualizarEstadoReserva = async (idReserva, estado) => {
         return { success: false, message: 'No se pudo conectar con el servidor.' };
     }
 };
+
+// ============================================================
+//  ZONAS DEL GUÍA
+// ============================================================
+// El backend valida que el idGuia corresponda a un usuario con rol
+// de guía, así que un explorador no puede crear zonas aunque llame
+// directamente al endpoint.
+
+export const crearZona = async (idGuia, datos) => {
+    try {
+        const res = await fetch(`${API_BASE}/rutas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...datos, idGuia })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo registrar la zona.' };
+        }
+
+        return { success: true, zona: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};
+
+export const actualizarZona = async (idZona, idGuia, datos) => {
+    try {
+        const res = await fetch(`${API_BASE}/rutas/${idZona}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...datos, idGuia })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo guardar la zona.' };
+        }
+
+        return { success: true, zona: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};
+
+// Elimina una zona. El backend rechaza el borrado si la zona no es del
+// guía o si todavía tiene eventos programados, y explica el motivo.
+export const eliminarZona = async (idZona, idGuia) => {
+    try {
+        const res = await fetch(`${API_BASE}/rutas/${idZona}?idGuia=${idGuia}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo eliminar la zona.' };
+        }
+
+        return { success: true };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};

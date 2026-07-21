@@ -1,14 +1,27 @@
+// js/dashboard-guia.js
+// Panel del guía. Todo se calcula a partir de las reservas que devuelve
+// el backend: no hay endpoints de estadísticas ni de finanzas, así que
+// los totales se derivan aquí.
+
+import { API_BASE } from './api/config.js';
+import { DEPORTES } from './api/rutasService.js';
+import {
+    cargarCatalogos,
+    formatearFecha,
+    obtenerGuiaPorUsuario,
+    obtenerReservasGuia
+} from './api/reservasService.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // --- 0. CONTROL DE ACCESO ---
-    // Si no hay sesión, o quien entra no es un guía, lo mandamos al inicio.
+    // --- 1. CONTROL DE ACCESO ---
     const sesion = JSON.parse(localStorage.getItem('horizon_user'));
     if (!sesion || sesion.role !== 'guide') {
         window.location.href = '../index.html';
         return;
     }
 
-    // --- 1. CONFIGURACIÓN Y NAVEGACIÓN DE PESTAÑAS ---
+    // --- 2. NAVEGACIÓN DE PESTAÑAS ---
     const controlesTab = document.querySelectorAll('.tab-control');
     const contenedoresTab = document.querySelectorAll('.tab-wrapper');
 
@@ -22,9 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // --- 2. CERRAR SESIÓN ---
-    // Se registra ANTES de cargar los datos, para que el botón sirva
-    // aunque la carga de información falle.
+    // --- 3. CERRAR SESIÓN ---
+    // Antes de cargar datos: si la carga falla, el botón sigue sirviendo.
     const btnSalir = document.getElementById('btn-cerrar-sesion');
     if (btnSalir) {
         btnSalir.addEventListener('click', () => {
@@ -33,94 +45,236 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- 3. SOLICITUD Y CARGA DE DATOS ASÍNCRONOS ---
+    // --- 4. HELPERS ---
+    const dinero = (n) => `$${Math.round(n).toLocaleString()}`;
+    const ahora = new Date();
+    const enElPasado = (iso) => iso && new Date(iso) < ahora;
+
+    // El nombre del cliente vive en `usuario`, dos saltos más allá de la
+    // reserva. Se cachea para no repetir peticiones por cada reseña.
+    const cacheClientes = new Map();
+    const nombreCliente = async (idExplorador, usuarios) => {
+        if (cacheClientes.has(idExplorador)) return cacheClientes.get(idExplorador);
+        try {
+            const res = await fetch(`${API_BASE}/exploradores/${idExplorador}`);
+            const exp = res.ok ? await res.json() : null;
+            const usuario = exp ? usuarios.get(exp.idUsuario) : null;
+            const nombre = usuario ? usuario.nombre : 'Cliente Horizon';
+            cacheClientes.set(idExplorador, nombre);
+            return nombre;
+        } catch {
+            return 'Cliente Horizon';
+        }
+    };
+
+    // --- 5. CARGA DE DATOS ---
     try {
-        const respuesta = await fetch('../assets/data/guides.json');
-        if (!respuesta.ok) throw new Error("No se pudo mapear la base de guías");
+        const guia = await obtenerGuiaPorUsuario(sesion.id);
 
-        const data = await respuesta.json();
+        if (!guia) {
+            document.getElementById('guide-name').textContent = sesion.name;
+            document.getElementById('guide-bio').textContent =
+                'Tu perfil de guía aún no está completo. Contacta al administrador para activarlo.';
+            return;
+        }
 
-        // Simulamos la sesión iniciada del guía Carlos Mendoza (ID: 1)
-        const guia = data.guides[0];
+        const [catalogos, reservasCrudas, documentos] = await Promise.all([
+            cargarCatalogos(),
+            obtenerReservasGuia(guia.idGuia),
+            fetch(`${API_BASE}/documentos-guia/guia/${guia.idGuia}`)
+                .then(r => r.ok ? r.json() : [])
+                .catch(() => [])
+        ]);
 
-        // Rellenar Datos Maestros
-        document.getElementById('guide-cover').style.backgroundImage = `url('${guia.cover_image}')`;
-        document.getElementById('guide-avatar').src = guia.profile_image;
-        document.getElementById('guide-badge-title').textContent = guia.title;
-        document.getElementById('guide-name').textContent = guia.name;
-        document.getElementById('guide-location').textContent = guia.location;
-        document.getElementById('guide-rating-summary').textContent = `${guia.rating} (${guia.total_routes} rutas) • ${guia.total_clients.toLocaleString()} clientes atendidos`;
+        // --- ACTIVIDADES DE ESTE GUÍA ---
+        // Las clases son suyas directamente; los eventos los hereda de sus zonas.
+        const misZonas = [...catalogos.zonas.values()].filter(z => z.idGuia === guia.idGuia);
+        const idsMisZonas = new Set(misZonas.map(z => z.id));
 
-        // Contadores Estadísticos
-        document.getElementById('stat-routes').textContent = guia.total_routes;
-        document.getElementById('stat-clients').textContent = guia.total_clients.toLocaleString();
-        document.getElementById('stat-rating').textContent = guia.rating;
-        document.getElementById('stat-years').textContent = guia.years_exp;
+        const actividades = [
+            ...[...catalogos.clases.values()]
+                .filter(c => c.idGuia === guia.idGuia)
+                .map(c => ({ ...c, id: c.idClase, esEvento: false, lugar: c.ubicacion })),
+            ...[...catalogos.eventos.values()]
+                .filter(e => idsMisZonas.has(e.idZona))
+                .map(e => ({
+                    ...e,
+                    id: e.idEvento,
+                    esEvento: true,
+                    lugar: (catalogos.zonas.get(e.idZona) || {}).nombre || ''
+                }))
+        ];
 
-        // Biografía y Certificados Fijos
-        document.getElementById('guide-bio').textContent = guia.bio;
+        // --- RESERVAS AGRUPADAS POR ACTIVIDAD ---
+        const reservasDe = (act) => reservasCrudas.filter(r =>
+            act.esEvento ? r.idEvento === act.id : r.idClase === act.id
+        );
+
+        const ocupanLugar = (r) => r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE';
+
+        const actividadesConDatos = actividades.map(act => {
+            const reservas = reservasDe(act);
+            const inscritos = reservas.filter(ocupanLugar).length;
+            const confirmadas = reservas.filter(r => r.estado === 'CONFIRMADA');
+            const ingreso = confirmadas.reduce((s, r) => s + Number(r.precioReserva || 0), 0);
+            const porcentaje = act.capacidad
+                ? Math.round((inscritos / act.capacidad) * 100)
+                : 0;
+
+            let estado = 'Abierta';
+            if (enElPasado(act.fecha)) estado = 'Completada';
+            else if (inscritos >= act.capacidad) estado = 'Cupo lleno';
+
+            return { ...act, reservas, inscritos, confirmadas, ingreso, porcentaje, estado };
+        }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        // --- CABECERA ---
+        const fotoGuia = guia.fotoUrl || sesion.fotoUrl
+            || `https://ui-avatars.com/api/?name=${encodeURIComponent(sesion.name)}&background=0f5b46&color=fff&size=200`;
+
+        document.getElementById('guide-cover').style.backgroundImage =
+            "url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1400')";
+        document.getElementById('guide-avatar').src = fotoGuia;
+        document.getElementById('guide-badge-title').textContent = guia.especialidad || 'Guía Horizon';
+        document.getElementById('guide-name').textContent = sesion.name;
+        document.getElementById('guide-location').textContent =
+            misZonas.length > 0 ? misZonas[0].ubicacion : 'Chiapas, México';
+        document.getElementById('guide-bio').textContent =
+            guia.descripcion || 'Este guía todavía no ha escrito su biografía.';
+
+        // --- RESEÑAS DE SUS CLIENTES ---
+        const idsMisReservas = new Set(reservasCrudas.map(r => r.idReserva));
+        const misResenas = catalogos.resenas.filter(r => idsMisReservas.has(r.idReserva));
+
+        const promedio = misResenas.length > 0
+            ? (misResenas.reduce((s, r) => s + r.calificacion, 0) / misResenas.length)
+            : 0;
+        const promedioTexto = misResenas.length > 0 ? promedio.toFixed(2) : '—';
+
+        // --- ESTADÍSTICAS ---
+        const completadas = actividadesConDatos.filter(a => enElPasado(a.fecha));
+        const clientesUnicos = new Set(
+            reservasCrudas.filter(r => r.estado === 'CONFIRMADA').map(r => r.idExplorador)
+        );
+
+        document.getElementById('stat-routes').textContent = completadas.length;
+        document.getElementById('stat-clients').textContent = clientesUnicos.size.toLocaleString();
+        document.getElementById('stat-rating').textContent = promedioTexto;
+        document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
+        document.getElementById('guide-rating-summary').textContent =
+            `${promedioTexto} (${actividadesConDatos.length} actividades) • ${clientesUnicos.size} clientes atendidos`;
+
+        // --- CERTIFICACIONES ---
+        const certificaciones = documentos.filter(d => d.tipo === 'CERTIFICACION');
         const listaCerts = document.getElementById('guide-certs');
-        listaCerts.innerHTML = guia.certifications.map(cert => `<li>${cert}</li>`).join('');
+        listaCerts.innerHTML = certificaciones.length > 0
+            ? certificaciones.map((_, i) => `<li>Certificación verificada #${i + 1}</li>`).join('')
+            : '<li style="color:#6B7280;">Sin certificaciones registradas</li>';
 
-        // RENDER: Pestaña Rutas Activas
+        // --- PESTAÑA: RUTAS ACTIVAS ---
+        const proximas = actividadesConDatos.filter(a => !enElPasado(a.fecha));
         const contenedorRutas = document.getElementById('lista-rutas-activas');
-        contenedorRutas.innerHTML = guia.rutas_activas.map(ruta => `
-            <div class="group-card">
-                <div class="group-card-top">
-                    <div class="group-info">
-                        <h4>${ruta.titulo}</h4>
-                        <p class="group-meta">🏕️ ${ruta.deporte} • ${ruta.lugar} • 📅 ${ruta.fecha} (${ruta.horario})</p>
-                    </div>
-                    <span class="group-status-pill ${ruta.estado.toLowerCase().replace(/\s+/g, '.')}">${ruta.estado}</span>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${ruta.porcentaje}%;"></div>
-                    </div>
-                    <div class="progress-labels">
-                        <span>${ruta.inscritos}/${ruta.cupo_max} inscritos</span>
-                        <span>${ruta.porcentaje}% del cupo</span>
-                    </div>
-                </div>
-                <div class="group-actions">
-                    <span class="estimated-value">$${ruta.ganancia_estimada} estimado</span>
-                    <button class="btn-text-action">Ver lista de participantes</button>
-                    <button class="btn-text-action">Gestionar grupo</button>
-                    <button class="btn-text-action">Detalles</button>
-                </div>
-            </div>
-        `).join('');
 
-        // RENDER: Pestaña Reseñas de Clientes
-        document.getElementById('review-score-big').textContent = guia.rating;
+        contenedorRutas.innerHTML = proximas.length === 0
+            ? '<p style="color:#6B7280; padding:15px 0;">No tienes actividades programadas próximamente.</p>'
+            : proximas.map(act => `
+                <div class="group-card">
+                    <div class="group-card-top">
+                        <div class="group-info">
+                            <h4>${act.titulo || 'Actividad sin título'}</h4>
+                            <p class="group-meta">🏕️ ${DEPORTES[act.idDeporte] || 'Actividad'} • ${act.lugar} • 📅 ${formatearFecha(act.fecha)} (${act.duracion || 'por definir'})</p>
+                        </div>
+                        <span class="group-status-pill">${act.estado}</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${Math.min(act.porcentaje, 100)}%;"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>${act.inscritos}/${act.capacidad} inscritos</span>
+                            <span>${act.porcentaje}% del cupo</span>
+                        </div>
+                    </div>
+                    <div class="group-actions">
+                        <span class="estimated-value">${dinero(act.ingreso)} confirmado</span>
+                        <button class="btn-text-action">Ver lista de participantes</button>
+                        <button class="btn-text-action">Gestionar grupo</button>
+                    </div>
+                </div>
+            `).join('');
+
+        // --- PESTAÑA: RESEÑAS ---
+        document.getElementById('review-score-big').textContent = promedioTexto;
         const contenedorResenas = document.getElementById('lista-resenas');
-        contenedorResenas.innerHTML = guia.resenas.map(res => `
-            <div class="review-card">
-                <div class="review-card-header">
-                    <strong>${res.cliente}</strong>
-                    <span>${res.fecha}</span>
-                </div>
-                <div class="review-sub">Clasificación: <span class="stars">${'★'.repeat(res.estrellas)}</span> • ${res.ruta}</div>
-                <p>"${res.comentario}"</p>
-            </div>
-        `).join('');
 
-        // RENDER: Pestaña Finanzas e Ingresos
-        document.getElementById('earn-month').textContent = `$${guia.ganancias.mes_actual.toLocaleString()}`;
-        document.getElementById('earn-month-sub').textContent = `${guia.ganancias.rutas_completadas_mes} rutas completadas`;
-        document.getElementById('earn-total').textContent = `$${guia.ganancias.total_cuatro_meses.toLocaleString()}`;
-        document.getElementById('earn-future').textContent = `$${guia.ganancias.proximas_ganancias.toLocaleString()}`;
-        document.getElementById('earn-future-sub').textContent = `de ${guia.ganancias.proximas_rutas_cant} rutas programadas`;
+        if (misResenas.length === 0) {
+            contenedorResenas.innerHTML =
+                '<p style="color:#6B7280; padding:15px 0;">Todavía no tienes reseñas de clientes.</p>';
+        } else {
+            // Se resuelven los nombres de cliente y la actividad de cada reseña.
+            const tarjetas = await Promise.all(misResenas.map(async (res) => {
+                const reserva = reservasCrudas.find(r => r.idReserva === res.idReserva);
+                const cliente = reserva
+                    ? await nombreCliente(reserva.idExplorador, catalogos.usuarios)
+                    : 'Cliente Horizon';
+
+                const actividad = reserva
+                    ? actividadesConDatos.find(a =>
+                        a.esEvento ? a.id === reserva.idEvento : a.id === reserva.idClase)
+                    : null;
+
+                return `
+                    <div class="review-card">
+                        <div class="review-card-header">
+                            <strong>${cliente}</strong>
+                            <span>${formatearFecha(res.fecha)}</span>
+                        </div>
+                        <div class="review-sub">
+                            Clasificación: <span class="stars">${'★'.repeat(res.calificacion)}</span>
+                            ${actividad ? ` • ${actividad.titulo}` : ''}
+                        </div>
+                        <p>"${res.comentario || 'Sin comentario.'}"</p>
+                    </div>`;
+            }));
+
+            contenedorResenas.innerHTML = tarjetas.join('');
+        }
+
+        // --- PESTAÑA: GANANCIAS ---
+        // Sólo cuentan las reservas CONFIRMADAS: pendientes y canceladas
+        // no representan dinero recibido.
+        const ingresoDe = (acts) => acts.reduce((s, a) => s + a.ingreso, 0);
+
+        const mismoMes = (iso) => {
+            if (!iso) return false;
+            const f = new Date(iso);
+            return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
+        };
+
+        const delMes = completadas.filter(a => mismoMes(a.fecha));
+        const futuras = actividadesConDatos.filter(a => !enElPasado(a.fecha));
+
+        document.getElementById('earn-month').textContent = dinero(ingresoDe(delMes));
+        document.getElementById('earn-month-sub').textContent =
+            `${delMes.length} ${delMes.length === 1 ? 'ruta completada' : 'rutas completadas'}`;
+        document.getElementById('earn-total').textContent = dinero(ingresoDe(completadas));
+        document.getElementById('earn-future').textContent = dinero(ingresoDe(futuras));
+        document.getElementById('earn-future-sub').textContent =
+            `de ${futuras.length} ${futuras.length === 1 ? 'ruta programada' : 'rutas programadas'}`;
 
         const contenedorDesglose = document.getElementById('lista-desglose-ganancias');
-        contenedorDesglose.innerHTML = guia.rutas_activas.map(ruta => `
-            <div class="breakdown-row">
-                <span class="route-name">🏕️ ${ruta.titulo} (${ruta.fecha})</span>
-                <span class="amount">$${ruta.ganancia_estimada} estimado</span>
-            </div>
-        `).join('');
+        contenedorDesglose.innerHTML = futuras.length === 0
+            ? '<p style="color:#6B7280;">Sin ingresos programados.</p>'
+            : futuras.map(act => `
+                <div class="breakdown-row">
+                    <span class="route-name">🏕️ ${act.titulo} (${formatearFecha(act.fecha)})</span>
+                    <span class="amount">${dinero(act.ingreso)} confirmado</span>
+                </div>
+            `).join('');
 
     } catch (error) {
         console.error("Error inicializando los datos del guía:", error);
+        document.getElementById('guide-bio').textContent =
+            'No se pudo conectar con el servidor. Revisa que el backend esté encendido.';
     }
 });

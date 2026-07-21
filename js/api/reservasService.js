@@ -1,0 +1,152 @@
+// js/api/reservasService.js
+// El backend devuelve las reservas "crudas": sólo IDs, sin el nombre de
+// la actividad ni el del guía. Aquí se componen esos datos cruzando
+// eventos, clases, zonas y usuarios en una sola pasada.
+
+import { API_BASE } from './config.js';
+import { DEPORTES } from './rutasService.js';
+
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+               'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+export const formatearFecha = (iso) => {
+    if (!iso) return 'Fecha por confirmar';
+    const f = new Date(iso);
+    if (isNaN(f)) return 'Fecha por confirmar';
+    return `${f.getDate()} ${MESES[f.getMonth()]} ${f.getFullYear()}`;
+};
+
+const jsonSeguro = async (url, porDefecto) => {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return porDefecto;
+        return await res.json();
+    } catch {
+        return porDefecto;
+    }
+};
+
+// Descarga de una sola vez los catálogos que hacen falta para resolver
+// cualquier reserva. Se pide todo en paralelo: no dependen entre sí.
+export const cargarCatalogos = async () => {
+    const [eventos, clases, zonas, usuarios, resenas] = await Promise.all([
+        jsonSeguro(`${API_BASE}/eventos`, []),
+        jsonSeguro(`${API_BASE}/clases`, []),
+        jsonSeguro(`${API_BASE}/rutas`, []),
+        jsonSeguro(`${API_BASE}/usuarios`, []),
+        jsonSeguro(`${API_BASE}/resenas`, [])
+    ]);
+
+    return {
+        eventos: new Map(eventos.map(e => [e.idEvento, e])),
+        clases: new Map(clases.map(c => [c.idClase, c])),
+        zonas: new Map(zonas.map(z => [z.id, z])),
+        usuarios: new Map(usuarios.map(u => [u.idUsuario, u])),
+        // idReserva -> reseña, para saber cuáles ya fueron calificadas
+        resenasPorReserva: new Map(resenas.map(r => [r.idReserva, r])),
+        resenas
+    };
+};
+
+// El nombre del guía vive en `usuario`, no en `guia` (para no duplicarlo).
+// Hace falta un salto extra por cada guía distinto, así que se cachea.
+const cacheGuias = new Map();
+
+export const nombreDelGuia = async (idGuia, usuarios) => {
+    if (!idGuia) return null;
+    if (cacheGuias.has(idGuia)) return cacheGuias.get(idGuia);
+
+    const guia = await jsonSeguro(`${API_BASE}/guias/${idGuia}`, null);
+    const usuario = guia ? usuarios.get(guia.idUsuario) : null;
+
+    const datos = guia ? {
+        idGuia,
+        nombre: usuario ? usuario.nombre : 'Guía Horizon',
+        fotoUrl: guia.fotoUrl || (usuario ? usuario.fotoUrl : null),
+        especialidad: guia.especialidad || '',
+        experienciaAnios: guia.experienciaAnios || 0,
+        descripcion: guia.descripcion || ''
+    } : null;
+
+    cacheGuias.set(idGuia, datos);
+    return datos;
+};
+
+// Convierte una reserva cruda en algo mostrable.
+// Regla del esquema: apunta a UNA clase o a UN evento, nunca a ambas.
+export const componerReserva = async (reserva, catalogos) => {
+    const esEvento = reserva.idEvento !== null && reserva.idEvento !== undefined;
+
+    const actividad = esEvento
+        ? catalogos.eventos.get(reserva.idEvento)
+        : catalogos.clases.get(reserva.idClase);
+
+    if (!actividad) {
+        return {
+            id: reserva.idReserva,
+            titulo: 'Actividad no disponible',
+            tipo: '—',
+            fechaISO: null,
+            fecha: 'Fecha por confirmar',
+            precio: Number(reserva.precioReserva || 0),
+            estado: reserva.estado,
+            guia: null,
+            tieneResena: catalogos.resenasPorReserva.has(reserva.idReserva)
+        };
+    }
+
+    // El guía de una clase es directo; el de un evento se hereda de su zona.
+    const idGuia = esEvento
+        ? (catalogos.zonas.get(actividad.idZona) || {}).idGuia
+        : actividad.idGuia;
+
+    const guia = await nombreDelGuia(idGuia, catalogos.usuarios);
+
+    const ubicacion = esEvento
+        ? (catalogos.zonas.get(actividad.idZona) || {}).ubicacion
+        : actividad.ubicacion;
+
+    return {
+        id: reserva.idReserva,
+        titulo: actividad.titulo || 'Actividad sin título',
+        tipo: DEPORTES[actividad.idDeporte] || 'Actividad',
+        modalidad: esEvento ? 'Evento' : 'Clase',
+        ubicacion: ubicacion || '',
+        fechaISO: actividad.fecha,
+        fecha: formatearFecha(actividad.fecha),
+        duracion: actividad.duracion || '',
+        precio: Number(reserva.precioReserva || 0),
+        estado: reserva.estado,
+        capacidad: actividad.capacidad,
+        fotoUrl: actividad.fotoUrl,
+        idGuia,
+        guia,
+        idActividad: esEvento ? actividad.idEvento : actividad.idClase,
+        esEvento,
+        tieneResena: catalogos.resenasPorReserva.has(reserva.idReserva)
+    };
+};
+
+export const componerReservas = async (reservas, catalogos) => {
+    return Promise.all(reservas.map(r => componerReserva(r, catalogos)));
+};
+
+// Una reserva es "próxima" si su fecha no ha pasado y no está cancelada.
+export const esProxima = (r) => {
+    if (r.estado === 'CANCELADA') return false;
+    if (!r.fechaISO) return true;
+    return new Date(r.fechaISO) >= new Date();
+};
+
+// Obtiene el perfil de explorador a partir del ID de usuario de la sesión.
+export const obtenerExplorador = async (idUsuario) =>
+    jsonSeguro(`${API_BASE}/exploradores/usuario/${idUsuario}`, null);
+
+export const obtenerReservasExplorador = async (idExplorador) =>
+    jsonSeguro(`${API_BASE}/reservas/explorador/${idExplorador}`, []);
+
+export const obtenerGuiaPorUsuario = async (idUsuario) =>
+    jsonSeguro(`${API_BASE}/guias/usuario/${idUsuario}`, null);
+
+export const obtenerReservasGuia = async (idGuia) =>
+    jsonSeguro(`${API_BASE}/reservas/guia/${idGuia}`, []);

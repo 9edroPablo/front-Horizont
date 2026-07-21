@@ -15,8 +15,6 @@ const inicializarActividades = async () => {
         const eventos = await obtenerEventos();
 
         const inputBuscar = document.getElementById('input-buscar');
-        const btnToggleFiltros = document.getElementById('btn-toggle-filtros');
-        const panelFiltros = document.getElementById('panel-filtros');
         const checkboxesDeporte = document.querySelectorAll('.chk-deporte');
         const botonesDificultad = document.querySelectorAll('.btn-dif-actividades');
         const contador = document.getElementById('contador-rutas');
@@ -61,12 +59,6 @@ const inicializarActividades = async () => {
 
         if (inputBuscar) {
             inputBuscar.addEventListener('input', aplicarFiltros);
-        }
-
-        if (btnToggleFiltros && panelFiltros) {
-            btnToggleFiltros.addEventListener('click', () => {
-                panelFiltros.hidden = !panelFiltros.hidden;
-            });
         }
 
         checkboxesDeporte.forEach(cb => cb.addEventListener('change', aplicarFiltros));

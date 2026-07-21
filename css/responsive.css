@@ -1,0 +1,355 @@
+/* ============================================================
+   Horizon — Adaptación a pantallas pequeñas
+   ------------------------------------------------------------
+   Se carga AL FINAL de cada página, después del resto de hojas,
+   para que estas reglas ganen sin necesidad de !important.
+
+   Puntos de corte:
+     1024px  tablet horizontal / laptop chica
+      768px  tablet vertical
+      480px  teléfono
+   ============================================================ */
+
+
+/* ============================================================
+   1024px — se acomodan las rejillas anchas
+   ============================================================ */
+@media (max-width: 1024px) {
+
+    /* Panel del guía: la barra lateral pasa debajo del contenido */
+    .content-split {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .earnings-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Las tarjetas de actividad caben desde 300px */
+    .rutas-grid,
+    .grid-actividades {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .dashboard-container,
+    .perfil-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+
+/* ============================================================
+   768px — tablet vertical: las filas horizontales se apilan
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* ---------- Encabezado ---------- */
+    .main-header {
+        padding: 1rem 1.25rem;
+        justify-content: center;
+    }
+
+    .header-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .header-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.9rem;
+    }
+
+    .btn-iniciar-sesion {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
+
+    /* ---------- Tarjetas de actividad ---------- */
+    .rutas-grid,
+    .grid-actividades {
+        grid-template-columns: 1fr;
+    }
+
+    .ruta-img-container,
+    .ruta-img-wrapper {
+        height: 200px;
+    }
+
+    /* ---------- Perfil ---------- */
+    .perfil-container {
+        margin-top: 30px;
+    }
+
+    .perfil-cover {
+        height: 150px;
+        margin-bottom: -40px;
+    }
+
+    .perfil-header-card {
+        padding: 20px;
+    }
+
+    /* Avatar arriba, datos debajo, botón al ancho completo */
+    .perfil-main-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .avatar-wrapper img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .user-titles {
+        padding-bottom: 0;
+    }
+
+    .user-titles h1 {
+        font-size: 22px;
+    }
+
+    .btn-editar {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0;
+    }
+
+    /* Las tres estadísticas se reparten en dos filas */
+    .perfil-stats {
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-between;
+    }
+
+    .stat-box {
+        flex: 1 1 30%;
+    }
+
+    .stat-box h3 { font-size: 20px; }
+    .stat-box p  { font-size: 12px; }
+
+    /* Pestañas: se deslizan en horizontal en vez de encimarse */
+    .tabs-nav,
+    .tabs-navigation {
+        gap: 18px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .tabs-nav::-webkit-scrollbar,
+    .tabs-navigation::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tabs-nav .tab-btn,
+    .tabs-navigation .tab-control {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Reservas e historial: título arriba, acciones abajo */
+    .list-item-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .item-actions {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+    }
+
+    /* ---------- Panel del guía ---------- */
+    .cover-photo {
+        height: 160px;
+    }
+
+    .identity-card {
+        padding: 20px;
+    }
+
+    .identity-layout {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .avatar-holder img {
+        width: 100px;
+        height: 100px;
+        margin-top: -60px;
+    }
+
+    /* Los tres botones al ancho completo, uno debajo de otro */
+    .identity-actions {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .identity-actions button {
+        width: 100%;
+    }
+
+    .group-card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .group-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .breakdown-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .reviews-summary-box {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* El calendario semanal no cabe en siete columnas */
+    .calendar-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* ---------- Modales inyectados desde JS ---------- */
+    .resena-modal,
+    .pg-modal,
+    .pu-modal {
+        padding: 22px 18px;
+    }
+
+    .resena-estrella {
+        font-size: 30px;
+    }
+}
+
+
+/* ============================================================
+   480px — teléfono
+   ============================================================ */
+@media (max-width: 480px) {
+
+    .stats-row,
+    .earnings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Con tres columnas los números quedan ilegibles */
+    .perfil-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .stat-box {
+        flex: 1 1 100%;
+    }
+
+    .perfil-header-card,
+    .identity-card {
+        padding: 16px;
+    }
+
+    .user-titles h1,
+    .identity-details h1 {
+        font-size: 20px;
+    }
+
+    .item-main-info h4 {
+        font-size: 16px;
+    }
+
+    /* El modal ocupa casi toda la pantalla: en 480px no sobra margen */
+    .resena-overlay,
+    .pg-overlay,
+    .pu-overlay {
+        padding: 12px;
+    }
+
+    .resena-modal,
+    .pg-modal,
+    .pu-modal {
+        padding: 20px 16px;
+    }
+
+    /* Botones de modal apilados: dos en fila quedan muy angostos */
+    .resena-acciones,
+    .pg-acciones,
+    .pu-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .rol-selector {
+        flex-direction: column;
+    }
+
+    .main-header {
+        padding: 0.9rem 1rem;
+    }
+
+    .nav-link {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.75rem;
+    }
+}
+
+
+/* ============================================================
+   Ajustes que no dependen del ancho
+   ============================================================ */
+
+/* Evita el desbordamiento lateral que provocan las imágenes y
+   los contenedores de ancho fijo en pantallas angostas. */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* En pantallas táctiles el hover no existe: sin esto, la tarjeta
+   se queda "levantada" tras tocarla. */
+@media (hover: none) {
+    .ruta-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-favorito:hover {
+        transform: none;
+    }
+}

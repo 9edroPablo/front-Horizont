@@ -58,6 +58,57 @@
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
         }
+
+        .panel-filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel-filtros-grupo h4 {
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            color: #6B7280;
+            margin-bottom: 12px;
+        }
+
+        .panel-filtros-grupo label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .grupo-dificultad {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-dif-actividades {
+            padding: 6px 14px;
+            border: 1px solid #D1D5DB;
+            border-radius: 999px;
+            background: #FFFFFF;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .btn-dif-actividades.active {
+            background: #0f5b46;
+            border-color: #0f5b46;
+            color: #FFFFFF;
+        }
     </style>
 </head>
 <body>
@@ -70,11 +121,30 @@
             <p>9 aventuras verificadas. Filtra por deporte, dificultad o destino y encuentra tu próxima ruta.</p>
             
             <div class="buscador-wrap">
-                <input type="text" placeholder="Buscar por nombre o destino...">
-                <button class="btn-filtros">Filtros</button>
+                <input type="text" id="input-buscar" placeholder="Buscar por nombre o destino...">
+                <button class="btn-filtros" id="btn-toggle-filtros">Filtros</button>
             </div>
-            
-            <p style="font-weight: 600; color: #374151;">9 rutas encontradas</p>
+
+            <div class="panel-filtros" id="panel-filtros" hidden>
+                <div class="panel-filtros-grupo">
+                    <h4>DEPORTE</h4>
+                    <label><input type="checkbox" class="chk-deporte" value="Senderismo" checked> Senderismo</label>
+                    <label><input type="checkbox" class="chk-deporte" value="Kayak" checked> Kayak</label>
+                    <label><input type="checkbox" class="chk-deporte" value="Escalada" checked> Escalada</label>
+                    <label><input type="checkbox" class="chk-deporte" value="Pesca" checked> Pesca</label>
+                </div>
+                <div class="panel-filtros-grupo">
+                    <h4>DIFICULTAD</h4>
+                    <div class="grupo-dificultad">
+                        <button class="btn-dif-actividades active" data-dificultad="todos">Todos</button>
+                        <button class="btn-dif-actividades" data-dificultad="facil">Fácil</button>
+                        <button class="btn-dif-actividades" data-dificultad="medio">Medio</button>
+                        <button class="btn-dif-actividades" data-dificultad="dificil">Difícil</button>
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-weight: 600; color: #374151;" id="contador-rutas">9 rutas encontradas</p>
         </div>
 
         <!-- Aquí inyectamos el componente reciclado -->

@@ -9,8 +9,10 @@ import {
     cargarCatalogos,
     formatearFecha,
     obtenerGuiaPorUsuario,
-    obtenerReservasGuia
+    obtenerReservasGuia,
+    actualizarGuia
 } from './api/reservasService.js';
+import { editarPerfilGuia } from './components/perfilGuiaModal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!guia) {
             document.getElementById('guide-name').textContent = sesion.name;
             document.getElementById('guide-bio').textContent =
-                'Tu perfil de guía aún no está completo. Contacta al administrador para activarlo.';
+                'No encontramos tu perfil de guía. Contacta al administrador para activarlo.';
             return;
         }
 
@@ -137,10 +139,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('guide-avatar').src = fotoGuia;
         document.getElementById('guide-badge-title').textContent = guia.especialidad || 'Guía Horizon';
         document.getElementById('guide-name').textContent = sesion.name;
+        // Localidad del guía; si no la ha declarado, la de su primera zona.
         document.getElementById('guide-location').textContent =
-            misZonas.length > 0 ? misZonas[0].ubicacion : 'Chiapas, México';
+            sesion.ubicacion
+            || (misZonas.length > 0 ? misZonas[0].ubicacion : 'Sin localidad');
         document.getElementById('guide-bio').textContent =
-            guia.descripcion || 'Este guía todavía no ha escrito su biografía.';
+            guia.descripcion || 'Aún no has escrito tu biografía. Toca "Editar perfil público" para completarla.';
+
+        // --- EDITAR PERFIL PÚBLICO ---
+        // El botón ya existe en el HTML; aquí se le da función.
+        const btnEditar = [...document.querySelectorAll('.identity-actions button')]
+            .find(b => b.textContent.trim().startsWith('Editar'));
+
+        if (btnEditar) {
+            btnEditar.addEventListener('click', async () => {
+                const datos = await editarPerfilGuia(guia);
+                if (!datos) return;
+
+                btnEditar.disabled = true;
+                btnEditar.textContent = 'Guardando...';
+
+                const resultado = await actualizarGuia(guia.idGuia, datos);
+
+                btnEditar.disabled = false;
+                btnEditar.textContent = 'Editar perfil público';
+
+                if (resultado.success) {
+                    // Se repinta sin recargar la página
+                    Object.assign(guia, resultado.guia);
+                    document.getElementById('guide-badge-title').textContent =
+                        guia.especialidad || 'Guía Horizon';
+                    document.getElementById('guide-bio').textContent =
+                        guia.descripcion || 'Aún no has escrito tu biografía.';
+                    document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
+                    if (guia.fotoUrl) document.getElementById('guide-avatar').src = guia.fotoUrl;
+                } else {
+                    alert(resultado.message);
+                }
+            });
+        }
 
         // --- RESEÑAS DE SUS CLIENTES ---
         const idsMisReservas = new Set(reservasCrudas.map(r => r.idReserva));

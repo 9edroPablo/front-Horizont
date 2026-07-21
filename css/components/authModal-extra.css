@@ -1,0 +1,49 @@
+/* ============================================
+   Selector de tipo de cuenta (registro)
+   Añadir al final de css/components/authModal.css
+   ============================================ */
+
+.rol-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.rol-opcion {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color .15s, background-color .15s;
+}
+
+.rol-opcion:hover {
+    border-color: #9CA3AF;
+}
+
+/* El radio real se oculta: la etiqueta completa es el área clicable */
+.rol-opcion input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.rol-opcion.activa {
+    border-color: #0F5B46;
+    background-color: rgba(15, 91, 70, .05);
+}
+
+.rol-titulo {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.rol-desc {
+    font-size: 11px;
+    color: #6B7280;
+    line-height: 1.3;
+}

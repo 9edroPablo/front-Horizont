@@ -65,6 +65,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
 
+        // Selector de tipo de cuenta: el radio real está oculto, así que
+        // el resaltado visual se mueve a mano entre las dos opciones.
+        const opcionesRol = formRegister.querySelectorAll('.rol-opcion');
+        opcionesRol.forEach(opcion => {
+            opcion.addEventListener('click', () => {
+                opcionesRol.forEach(o => o.classList.remove('activa'));
+                opcion.classList.add('activa');
+                opcion.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
         // Guarda la sesión y decide a dónde mandar al usuario
         const iniciarSesionEnUI = (usuario, form) => {
             localStorage.setItem('horizon_user', JSON.stringify(usuario));
@@ -175,11 +186,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!esValido) return;
 
+            const seleccionRol = formRegister.querySelector('input[name="tipo-cuenta"]:checked');
+            const esGuia = seleccionRol ? seleccionRol.value === 'guia' : false;
+
             const resultado = await conBotonCargando(formRegister, 'Creando cuenta...', async () => {
                 const registro = await registrarUser({
                     nombre: nombreValor,
                     email: emailValor,
-                    password: passwordValor
+                    password: passwordValor,
+                    esGuia
                 });
 
                 // Si el registro salió bien, entramos automáticamente

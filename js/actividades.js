@@ -3,6 +3,7 @@
 
 import { crearRutaCard } from './components/RutaCard.js';
 import { obtenerEventos } from './api/eventosService.js';
+import { activarFavoritos } from './components/favoritos.js';
 
 const inicializarActividades = async () => {
     const contenedor = document.getElementById('grid-todas-rutas');
@@ -20,6 +21,7 @@ const inicializarActividades = async () => {
 
         // Misma plantilla que usa la página de inicio: un solo lugar que mantener
         contenedor.innerHTML = eventos.map(crearRutaCard).join('');
+        activarFavoritos(contenedor);
 
     } catch (error) {
         console.error('Error al cargar las actividades:', error);

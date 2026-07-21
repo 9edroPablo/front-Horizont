@@ -56,6 +56,21 @@
                     <input type="password" id="register-password" placeholder="Contraseña" class="form-input">
                     <span class="password-icon">👁️</span>
                 </div>
+
+                <!-- Tipo de cuenta: define el idRol que se envía al backend -->
+                <div class="input-group rol-selector">
+                    <label class="rol-opcion activa">
+                        <input type="radio" name="tipo-cuenta" value="explorador" checked>
+                        <span class="rol-titulo">Explorador</span>
+                        <span class="rol-desc">Quiero reservar actividades</span>
+                    </label>
+                    <label class="rol-opcion">
+                        <input type="radio" name="tipo-cuenta" value="guia">
+                        <span class="rol-titulo">Guía</span>
+                        <span class="rol-desc">Quiero ofrecer mis rutas</span>
+                    </label>
+                </div>
+
                 <button type="submit" class="btn-submit">Crear mi cuenta</button>
             </form>
 

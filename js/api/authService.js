@@ -16,6 +16,7 @@ const adaptarUsuario = (u) => ({
     email: u.correo,
     avatar: iniciales(u.nombre),
     fotoUrl: u.fotoUrl,
+    ubicacion: u.ubicacion,
     role: u.idRol === ROL.GUIA ? 'guide' : 'user'
 });
 

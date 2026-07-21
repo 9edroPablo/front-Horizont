@@ -227,3 +227,116 @@ export const cancelarReserva = async (idReserva) => {
         };
     }
 };
+
+// Crea una reseña. El backend exige que la reserva esté CONFIRMADA,
+// que no tenga ya una reseña, y que la calificación esté entre 1 y 5.
+export const crearResena = async ({ idReserva, calificacion, comentario }) => {
+    try {
+        const res = await fetch(`${API_BASE}/resenas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idReserva, calificacion, comentario })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return {
+                success: false,
+                message: error.mensaje || 'No se pudo guardar la reseña.'
+            };
+        }
+
+        return { success: true, resena: await res.json() };
+
+    } catch {
+        return {
+            success: false,
+            message: 'No se pudo conectar con el servidor.'
+        };
+    }
+};
+
+// Actualiza el perfil público del guía. El backend reemplaza los cuatro
+// campos editables, así que hay que mandarlos todos aunque no cambien.
+export const actualizarGuia = async (idGuia, datos) => {
+    try {
+        const res = await fetch(`${API_BASE}/guias/${idGuia}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return {
+                success: false,
+                message: error.mensaje || 'No se pudo guardar el perfil.'
+            };
+        }
+
+        return { success: true, guia: await res.json() };
+
+    } catch {
+        return {
+            success: false,
+            message: 'No se pudo conectar con el servidor.'
+        };
+    }
+};
+
+// Actualiza nombre, correo y foto del usuario.
+export const actualizarUsuario = async (idUsuario, datos) => {
+    try {
+        const res = await fetch(`${API_BASE}/usuarios/${idUsuario}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo guardar el perfil.' };
+        }
+
+        return { success: true, usuario: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};
+
+// Actualiza el nivel de experiencia del explorador.
+export const actualizarNivel = async (idExplorador, nivel) => {
+    try {
+        const res = await fetch(`${API_BASE}/exploradores/${idExplorador}/nivel`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nivel })
+        });
+        if (!res.ok) return { success: false };
+        return { success: true, explorador: await res.json() };
+    } catch {
+        return { success: false };
+    }
+};
+
+// Cambia la contraseña. El backend exige la actual y la verifica.
+export const cambiarPassword = async (idUsuario, passwordActual, passwordNueva) => {
+    try {
+        const res = await fetch(`${API_BASE}/usuarios/${idUsuario}/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ passwordActual, passwordNueva })
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudo cambiar la contraseña.' };
+        }
+
+        return { success: true };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};

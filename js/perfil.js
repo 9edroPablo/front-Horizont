@@ -8,8 +8,23 @@ import {
     esProxima,
     obtenerExplorador,
     obtenerReservasExplorador,
-    cancelarReserva
+    cancelarReserva,
+    crearResena
 } from './api/reservasService.js';
+import { pedirResena } from './components/resenaModal.js';
+import { obtenerIdsFavoritos } from './api/favoritosService.js';
+import { crearRutaCard } from './components/RutaCard.js';
+import { obtenerEventos } from './api/eventosService.js';
+import { activarFavoritos } from './components/favoritos.js';
+import {
+    actualizarUsuario,
+    actualizarNivel,
+    cambiarPassword
+} from './api/reservasService.js';
+import {
+    editarPerfilUsuario,
+    cambiarPasswordModal
+} from './components/perfilUsuarioModal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -94,6 +109,86 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('user-badges').innerHTML =
             `<span class="badge-item">🏅 Nivel ${nivel.toLowerCase()}</span>`;
 
+        // --- EDITAR PERFIL ---
+        // Dos accesos al mismo formulario: el botón de la cabecera y la
+        // opción de Configuración. Comparten manejador.
+        const abrirEdicion = async () => {
+            const datos = await editarPerfilUsuario(sesion, explorador.nivel || 'PRINCIPIANTE');
+            if (!datos) return;
+
+            const resultado = await actualizarUsuario(sesion.id, {
+                nombre: datos.nombre,
+                correo: datos.correo,
+                fotoUrl: datos.fotoUrl,
+                ubicacion: datos.ubicacion
+            });
+
+            if (!resultado.success) {
+                alert(resultado.message);
+                return;
+            }
+
+            // El nivel vive en otra tabla, así que va en su propia llamada.
+            if (datos.nivel !== explorador.nivel) {
+                await actualizarNivel(explorador.idExplorador, datos.nivel);
+                explorador.nivel = datos.nivel;
+            }
+
+            // La sesión guardada en el navegador quedaría desfasada:
+            // el header seguiría mostrando el nombre viejo.
+            sesion.name = resultado.usuario.nombre;
+            sesion.email = resultado.usuario.correo;
+            sesion.fotoUrl = resultado.usuario.fotoUrl;
+            sesion.ubicacion = resultado.usuario.ubicacion;
+            localStorage.setItem('horizon_user', JSON.stringify(sesion));
+
+            document.getElementById('user-name').textContent = sesion.name;
+            document.getElementById('user-handle').textContent = sesion.email;
+            document.getElementById('user-location').textContent =
+                sesion.ubicacion || 'Sin localidad';
+            document.getElementById('user-bio').textContent =
+                `Explorador de nivel ${(explorador.nivel || 'PRINCIPIANTE').toLowerCase()} en Horizon.`;
+            document.getElementById('user-badges').innerHTML =
+                `<span class="badge-item">🏅 Nivel ${(explorador.nivel || 'PRINCIPIANTE').toLowerCase()}</span>`;
+            if (sesion.fotoUrl) document.getElementById('user-avatar').src = sesion.fotoUrl;
+
+            if (typeof window.actualizarHeaderUI === 'function') window.actualizarHeaderUI();
+        };
+
+        const btnEditar = document.querySelector('.btn-editar');
+        if (btnEditar) btnEditar.addEventListener('click', abrirEdicion);
+
+        // Opciones de la pestaña Configuración. Se identifican por su
+        // título porque el HTML no les puso id.
+        const opcionConfig = (textoInicial) =>
+            [...document.querySelectorAll('.setting-item h4')]
+                .find(h => h.textContent.trim().startsWith(textoInicial))
+                ?.closest('.setting-item');
+
+        const itemEditar = opcionConfig('Editar información');
+        if (itemEditar) {
+            itemEditar.style.cursor = 'pointer';
+            itemEditar.addEventListener('click', abrirEdicion);
+        }
+
+        // --- CAMBIAR CONTRASEÑA ---
+        const itemPassword = opcionConfig('Privacidad');
+        if (itemPassword) {
+            itemPassword.style.cursor = 'pointer';
+            itemPassword.addEventListener('click', async () => {
+                const datos = await cambiarPasswordModal();
+                if (!datos) return;
+
+                const resultado = await cambiarPassword(
+                    sesion.id, datos.passwordActual, datos.passwordNueva
+                );
+
+                alert(resultado.success
+                    ? 'Contraseña actualizada correctamente.'
+                    : resultado.message);
+            });
+        }
+
         const [catalogos, reservasCrudas] = await Promise.all([
             cargarCatalogos(),
             obtenerReservasExplorador(explorador.idExplorador)
@@ -101,10 +196,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const reservas = await componerReservas(reservasCrudas, catalogos);
 
-        // Ubicación: la de la actividad más reciente que haya reservado.
-        const conUbicacion = reservas.find(r => r.ubicacion);
+        // Ubicación declarada por el usuario en su perfil.
         document.getElementById('user-location').textContent =
-            conUbicacion ? conUbicacion.ubicacion : 'Chiapas, México';
+            sesion.ubicacion || 'Sin localidad';
 
         // --- ESTADÍSTICAS ---
         const completadas = reservas.filter(r => r.estado === 'CONFIRMADA' && !esProxima(r));
@@ -181,6 +275,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const historial = reservas.filter(r => !esProxima(r))
                                   .sort((a, b) => new Date(b.fechaISO) - new Date(a.fechaISO));
 
+        // Sólo se puede reseñar una reserva CONFIRMADA y sin reseña previa.
+        // Es la misma regla que aplica el backend: mostrar el botón en otros
+        // casos sólo llevaría a un rechazo que el usuario no entendería.
+        const botonResena = (hist) => {
+            if (hist.tieneResena) {
+                return '<button class="btn-ghost" style="margin:0;" disabled>Ya reseñada</button>';
+            }
+            if (hist.estado !== 'CONFIRMADA') {
+                return `<span class="status-badge ${hist.estado.toLowerCase()}">${hist.estado}</span>`;
+            }
+            return `<button class="btn-ghost btn-resenar" style="margin:0;"
+                        data-id="${hist.id}" data-titulo="${hist.titulo.replace(/"/g, '&quot;')}">
+                        Dejar reseña
+                    </button>`;
+        };
+
         listaHistorial.innerHTML = historial.length === 0
             ? vacio('Aún no has completado ninguna actividad.', false)
             : historial.map(hist => `
@@ -190,12 +300,56 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p class="item-meta">🏕️ ${hist.tipo} • ${hist.fecha}${hist.estado === 'CANCELADA' ? ' • Cancelada' : ''}</p>
                     </div>
                     <div class="item-actions">
-                        <button class="btn-ghost" style="margin: 0;" ${hist.tieneResena ? 'disabled' : ''}>
-                            ${hist.tieneResena ? 'Ya reseñada' : 'Dejar reseña'}
-                        </button>
+                        ${botonResena(hist)}
                     </div>
                 </div>
             `).join('');
+
+        // --- DEJAR RESEÑA ---
+        listaHistorial.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-resenar');
+            if (!btn) return;
+
+            const datos = await pedirResena(btn.dataset.titulo);
+            if (!datos) return; // canceló
+
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            const resultado = await crearResena({
+                idReserva: btn.dataset.id,
+                calificacion: datos.calificacion,
+                comentario: datos.comentario
+            });
+
+            if (resultado.success) {
+                btn.textContent = 'Ya reseñada';
+                // La estadística de reseñas del encabezado queda desfasada
+                // hasta recargar; la actualizamos aquí mismo.
+                const stat = document.getElementById('stat-resenas');
+                stat.textContent = Number(stat.textContent) + 1;
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Dejar reseña';
+                alert(resultado.message);
+            }
+        });
+
+        // --- PESTAÑA: GUARDADOS ---
+        const tabGuardados = document.getElementById('tab-guardados');
+        const idsGuardados = await obtenerIdsFavoritos(sesion.id);
+
+        if (idsGuardados.size > 0) {
+            const eventos = await obtenerEventos();
+            const guardados = eventos.filter(e => idsGuardados.has(e.id));
+
+            if (guardados.length > 0) {
+                tabGuardados.innerHTML =
+                    `<div class="rutas-grid">${guardados.map(crearRutaCard).join('')}</div>`;
+                activarFavoritos(tabGuardados);
+            }
+        }
+        // Si no hay ninguna, se conserva el estado vacío que ya trae el HTML.
 
     } catch (error) {
         console.error("Error cargando la información del perfil:", error);

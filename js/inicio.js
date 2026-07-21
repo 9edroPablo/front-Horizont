@@ -4,6 +4,7 @@
 import { crearRutaCard } from './components/RutaCard.js';
 import { obtenerRutas } from './api/rutasService.js';
 import { obtenerEventos } from './api/eventosService.js';
+import { activarFavoritos } from './components/favoritos.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
@@ -145,6 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const eventos = await obtenerEventos();
             // En la portada mostramos solo las próximas seis
             contenedorRutas.innerHTML = eventos.slice(0, 6).map(crearRutaCard).join('');
+            // Los corazones se colocan encima de las tarjetas ya renderizadas
+            activarFavoritos(contenedorRutas);
         } catch (error) {
             console.error("Error al renderizar los eventos:", error);
             contenedorRutas.innerHTML = `

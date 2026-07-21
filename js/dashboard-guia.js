@@ -13,6 +13,7 @@ import {
     actualizarGuia,
     obtenerDeportes,
     crearActividad,
+    actualizarActividad,
     actualizarEstadoReserva,
     crearZona,
     actualizarZona,
@@ -248,6 +249,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div class="group-actions">
                         <span class="estimated-value">${dinero(act.ingreso)} confirmado</span>
+                        <button class="btn-text-action btn-editar-actividad"
+                                data-id="${act.id}" data-tipo="${act.esEvento ? 'evento' : 'clase'}">Editar</button>
                         <button class="btn-text-action btn-participantes"
                                 data-id="${act.id}" data-tipo="${act.esEvento ? 'evento' : 'clase'}">
                             Ver participantes${act.reservas.filter(r => r.estado === 'PENDIENTE').length > 0
@@ -416,6 +419,80 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Cambiar un estado altera cupos, ingresos y estadísticas:
             // recargar es más fiable que recalcular a mano cada número.
             if (huboCambios) window.location.reload();
+        });
+
+        // --- EDITAR UNA ACTIVIDAD YA PUBLICADA ---
+        contenedorRutas.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.btn-editar-actividad');
+            if (!btn) return;
+
+            const esEventoBtn = btn.dataset.tipo === 'evento';
+            const idActividad = Number(btn.dataset.id);
+            const actividad = actividadesConDatos.find(a =>
+                a.esEvento === esEventoBtn && a.id === idActividad);
+            if (!actividad) return;
+
+            const deportes = await obtenerDeportes();
+
+            const resultado = await crearActividadModal({
+                zonas: misZonas.map(z => ({ id: z.id, nombre: z.nombre })),
+                deportes,
+                actividadExistente: {
+                    id: actividad.id,
+                    tipo: esEventoBtn ? 'evento' : 'clase',
+                    titulo: actividad.titulo,
+                    descripcion: actividad.descripcion,
+                    idDeporte: actividad.idDeporte,
+                    idZona: esEventoBtn ? actividad.idZona : null,
+                    ubicacion: esEventoBtn ? null : actividad.ubicacion,
+                    fechaISO: actividad.fecha,
+                    duracion: actividad.duracion,
+                    precio: actividad.precio,
+                    capacidad: actividad.capacidad,
+                    fotoUrl: actividad.fotoUrl
+                }
+            });
+            if (!resultado) return;
+
+            const { tipo, datos } = resultado;
+
+            const cuerpo = tipo === 'evento'
+                ? {
+                    idDeporte: datos.idDeporte,
+                    idZona: datos.idZona,
+                    titulo: datos.titulo,
+                    descripcion: datos.descripcion,
+                    fecha: datos.fecha,
+                    duracion: datos.duracion,
+                    precio: datos.precio,
+                    capacidad: datos.capacidad,
+                    fotoUrl: datos.fotoUrl
+                }
+                : {
+                    idGuia: guia.idGuia,
+                    idDeporte: datos.idDeporte,
+                    titulo: datos.titulo,
+                    descripcion: datos.descripcion,
+                    ubicacion: datos.ubicacion,
+                    fecha: datos.fecha,
+                    duracion: datos.duracion,
+                    precio: datos.precio,
+                    capacidad: datos.capacidad,
+                    fotoUrl: datos.fotoUrl
+                };
+
+            btn.disabled = true;
+            btn.textContent = 'Guardando...';
+
+            const respuesta = await actualizarActividad(tipo, idActividad, cuerpo);
+
+            if (respuesta.success) {
+                window.location.reload();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Editar';
+                alert(respuesta.message);
+            }
         });
 
         // --- PUBLICAR UNA ACTIVIDAD NUEVA ---

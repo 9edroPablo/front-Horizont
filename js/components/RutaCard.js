@@ -2,9 +2,11 @@
 // Plantilla única de tarjeta. La usan index.html y pages/actividades.html.
 
 // La ruta al detalle cambia según desde dónde se renderice la tarjeta.
-const rutaDetalle = (id) => {
+// El tipo (evento/clase) viaja en la URL porque comparten el mismo id
+// autoincremental y ruta-detalle.js necesita saber a cuál API pedirle.
+const rutaDetalle = (id, tipo = 'evento') => {
     const enPages = window.location.pathname.includes('/pages/');
-    return `${enPages ? '' : 'pages/'}ruta-detalle.html?id=${id}`;
+    return `${enPages ? '' : 'pages/'}ruta-detalle.html?id=${id}&tipo=${tipo}`;
 };
 
 export const crearRutaCard = (ruta) => {
@@ -18,7 +20,7 @@ export const crearRutaCard = (ruta) => {
         : '';
 
     return `
-    <a href="${rutaDetalle(ruta.id)}" class="ruta-card">
+    <a href="${rutaDetalle(ruta.id, ruta.tipo)}" class="ruta-card">
         <!-- Imagen y Etiquetas -->
         <div class="ruta-img-wrapper">
             <img src="${ruta.imagen}" alt="${ruta.titulo}">

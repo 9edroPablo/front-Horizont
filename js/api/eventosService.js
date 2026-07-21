@@ -17,6 +17,7 @@ const formatearFecha = (iso) => {
 
 const adaptarEvento = (e) => ({
     id: e.idEvento,
+    tipo: 'evento',
     titulo: e.titulo || 'Actividad sin título',
     descripcion: e.descripcion || '',
     categoria: DEPORTES[e.idDeporte] || 'Otro',

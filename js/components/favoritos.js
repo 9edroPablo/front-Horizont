@@ -48,9 +48,14 @@ export const activarFavoritos = async (contenedor) => {
     const guardados = await obtenerIdsFavoritos(sesion.id);
 
     contenedor.querySelectorAll('.ruta-card').forEach(tarjeta => {
-        // El id viaja en el href de la tarjeta: ...ruta-detalle.html?id=3
-        const idEvento = Number(new URLSearchParams(tarjeta.search || tarjeta.href.split('?')[1]).get('id'));
+        // El id (y el tipo) viajan en el href: ...ruta-detalle.html?id=3&tipo=evento
+        const parametros = new URLSearchParams(tarjeta.search || tarjeta.href.split('?')[1]);
+        const idEvento = Number(parametros.get('id'));
         if (!idEvento) return;
+
+        // La tabla `favorito` solo tiene columna para idEvento: guardar
+        // una clase guardaría el id equivocado, así que no se ofrece.
+        if (parametros.get('tipo') === 'clase') return;
 
         const marco = tarjeta.querySelector('.ruta-img-wrapper');
         if (!marco || marco.querySelector('.btn-favorito')) return;

@@ -3,6 +3,7 @@
 
 import { crearRutaCard } from './components/RutaCard.js';
 import { obtenerEventos } from './api/eventosService.js';
+import { obtenerClases } from './api/clasesService.js';
 import { activarFavoritos } from './components/favoritos.js';
 
 const inicializarActividades = async () => {
@@ -12,7 +13,13 @@ const inicializarActividades = async () => {
     contenedor.innerHTML = '<p style="padding: 20px; color: #6B7280;">Cargando actividades...</p>';
 
     try {
-        const eventos = await obtenerEventos();
+        // Eventos y clases son actividades distintas en el esquema, pero
+        // el explorador las ve como un solo catálogo.
+        const [eventosSolos, clases] = await Promise.all([
+            obtenerEventos(),
+            obtenerClases().catch(() => [])
+        ]);
+        const eventos = [...eventosSolos, ...clases];
 
         const inputBuscar = document.getElementById('input-buscar');
         const checkboxesDeporte = document.querySelectorAll('.chk-deporte');

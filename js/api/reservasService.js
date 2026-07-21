@@ -376,6 +376,28 @@ export const crearActividad = async (tipo, datos) => {
     }
 };
 
+// Edita un evento o clase ya publicado.
+export const actualizarActividad = async (tipo, id, datos) => {
+    const ruta = tipo === 'evento' ? 'eventos' : 'clases';
+    try {
+        const res = await fetch(`${API_BASE}/${ruta}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            return { success: false, message: error.mensaje || 'No se pudieron guardar los cambios.' };
+        }
+
+        return { success: true, actividad: await res.json() };
+
+    } catch {
+        return { success: false, message: 'No se pudo conectar con el servidor.' };
+    }
+};
+
 // Confirma o rechaza una reserva. Lo usa el guía desde su panel.
 export const actualizarEstadoReserva = async (idReserva, estado) => {
     try {

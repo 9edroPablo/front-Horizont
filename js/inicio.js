@@ -4,6 +4,7 @@
 import { crearRutaCard } from './components/RutaCard.js';
 import { obtenerRutas } from './api/rutasService.js';
 import { obtenerEventos } from './api/eventosService.js';
+import { obtenerClases } from './api/clasesService.js';
 import { activarFavoritos } from './components/favoritos.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -143,9 +144,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!contenedorRutas) return;
 
         try {
-            const eventos = await obtenerEventos();
-            // En la portada mostramos solo las próximas seis
-            contenedorRutas.innerHTML = eventos.slice(0, 6).map(crearRutaCard).join('');
+            const [eventos, clases] = await Promise.all([
+                obtenerEventos(),
+                obtenerClases().catch(() => [])
+            ]);
+            // En la portada mostramos solo las próximas seis, mezclando
+            // eventos y clases (son actividades distintas en el esquema).
+            const actividades = [...eventos, ...clases];
+            contenedorRutas.innerHTML = actividades.slice(0, 6).map(crearRutaCard).join('');
             // Los corazones se colocan encima de las tarjetas ya renderizadas
             activarFavoritos(contenedorRutas);
         } catch (error) {

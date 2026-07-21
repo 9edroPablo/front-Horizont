@@ -4,6 +4,7 @@
 
 import { API_BASE } from './api/config.js';
 import { obtenerEventoPorId } from './api/eventosService.js';
+import { obtenerClasePorId } from './api/clasesService.js';
 import {
     obtenerCupos,
     crearReserva,
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const parametrosURL = new URLSearchParams(window.location.search);
     const rutaId = parseInt(parametrosURL.get('id'));
+    const esEvento = parametrosURL.get('tipo') !== 'clase';
     const contenedor = document.getElementById('contenido-dinamico');
 
     const mostrarMensaje = (titulo, detalle = '') => {
@@ -93,9 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Reseñas de ESTA actividad puntual: se filtran las reservas del guía
-    // de la zona a las que apuntan a este evento, y de esas se toman las
-    // que ya tienen reseña.
-    const cargarResenasRuta = async (idEvento, idGuia) => {
+    // (de la zona si es evento, directo si es clase) que apuntan a esta
+    // actividad, y de esas se toman las que ya tienen reseña.
+    const cargarResenasRuta = async (idActividad, idGuia) => {
         if (!idGuia) return [];
         try {
             const [reservasDelGuia, resResenas] = await Promise.all([
@@ -106,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const exploradorPorReserva = new Map(
                 reservasDelGuia
-                    .filter(r => r.idEvento === idEvento)
+                    .filter(r => esEvento ? r.idEvento === idActividad : r.idClase === idActividad)
                     .map(r => [r.idReserva, r.idExplorador])
             );
 
@@ -174,7 +176,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cargarDetalleRuta = async () => {
         try {
-            const ruta = await obtenerEventoPorId(rutaId);
+            const ruta = esEvento
+                ? await obtenerEventoPorId(rutaId)
+                : await obtenerClasePorId(rutaId);
 
             if (!ruta) {
                 mostrarMensaje(
@@ -184,13 +188,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // La zona aporta ubicación y dificultad; el guía viene de ella.
-            const zona = await cargarZona(ruta.idZona);
-            const guia = zona ? await cargarGuia(zona.idGuia) : null;
-            const resenas = zona ? await cargarResenasRuta(rutaId, zona.idGuia) : [];
+            // Un evento hereda ubicación/dificultad/guía de su zona; una
+            // clase ya trae su propia ubicación y guía, sin zona de por medio.
+            const zona = esEvento ? await cargarZona(ruta.idZona) : null;
+            const idGuia = esEvento ? (zona ? zona.idGuia : null) : ruta.idGuia;
+            const guia = idGuia ? await cargarGuia(idGuia) : null;
+            const resenas = idGuia ? await cargarResenasRuta(rutaId, idGuia) : [];
 
-            const ubicacion = zona ? zona.ubicacion : '';
-            const dificultad = zona ? (zona.nivelDificultad || '').toLowerCase() : '';
+            const ubicacion = esEvento ? (zona ? zona.ubicacion : '') : ruta.ubicacion;
+            const dificultad = esEvento ? (zona ? (zona.nivelDificultad || '').toLowerCase() : '') : '';
             const descripcion = ruta.descripcion
                 || (zona ? zona.descripcion : '')
                 || 'Sin descripción disponible por el momento.';
@@ -288,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cuposValor.className = 'texto-verde';
             };
 
-            let cupos = await obtenerCupos(rutaId, true);
+            let cupos = await obtenerCupos(rutaId, esEvento);
             pintarCupos(cupos);
 
             btnReservar.addEventListener('click', async () => {
@@ -325,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const resultado = await crearReserva({
                     idExplorador: explorador.idExplorador,
                     idActividad: rutaId,
-                    esEvento: true,
+                    esEvento,
                     precio: ruta.precio
                 });
 
@@ -336,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     nota.className = 'reserva-nota';
 
                     // Refrescamos los cupos: acaba de ocuparse uno
-                    cupos = await obtenerCupos(rutaId, true);
+                    cupos = await obtenerCupos(rutaId, esEvento);
                     if (cupos !== null) {
                         cuposValor.textContent = `${cupos} ${cupos === 1 ? 'lugar' : 'lugares'}`;
                     }

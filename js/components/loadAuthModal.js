@@ -58,6 +58,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             textLogin.classList.add('hidden');
         });
 
+        // El login con Google todavía no está implementado (requiere un
+        // proyecto de OAuth propio); se avisa en vez de no hacer nada.
+        const btnGoogle = document.querySelector('.btn-google');
+        if (btnGoogle) {
+            btnGoogle.addEventListener('click', () => {
+                const original = btnGoogle.innerHTML;
+                btnGoogle.disabled = true;
+                btnGoogle.textContent = 'Disponible próximamente';
+                setTimeout(() => {
+                    btnGoogle.innerHTML = original;
+                    btnGoogle.disabled = false;
+                }, 2000);
+            });
+        }
+
         // Limpiar errores en cuanto el usuario empiece a escribir (ambos formularios)
         [formLogin, formRegister].forEach(form => {
             form.querySelectorAll('input').forEach(input => {

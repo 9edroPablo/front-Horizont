@@ -23,6 +23,11 @@ import { crearActividadModal } from './components/actividadModal.js';
 import { verParticipantes } from './components/participantesModal.js';
 import { editarZonaModal } from './components/zonaModal.js';
 
+// Evita que nombres, comentarios, etc. se interpreten como HTML.
+const escapeHtml = (valor) => String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 1. CONTROL DE ACCESO ---
@@ -584,6 +589,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- PESTAÑA: RESEÑAS ---
         document.getElementById('review-score-big').textContent = promedioTexto;
+
+        // Desglose de calificaciones (antes venía fijo en el HTML: 92%/6%/2%).
+        const contenedorBarras = document.getElementById('score-bars');
+        const conteoPorEstrella = [5, 4, 3, 2, 1].map(estrella => ({
+            estrella,
+            cantidad: misResenas.filter(r => r.calificacion === estrella).length
+        }));
+        contenedorBarras.innerHTML = conteoPorEstrella.map(({ estrella, cantidad }) => {
+            const porcentaje = misResenas.length > 0
+                ? Math.round((cantidad / misResenas.length) * 100)
+                : 0;
+            return `
+                <div class="bar-row">
+                    <span>${estrella}★</span>
+                    <div class="bar"><div class="fill" style="width: ${porcentaje}%;"></div></div>
+                    <span>${porcentaje}%</span>
+                </div>`;
+        }).join('');
+
         const contenedorResenas = document.getElementById('lista-resenas');
 
         if (misResenas.length === 0) {
@@ -605,14 +629,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                     <div class="review-card">
                         <div class="review-card-header">
-                            <strong>${cliente}</strong>
+                            <strong>${escapeHtml(cliente)}</strong>
                             <span>${formatearFecha(res.fecha)}</span>
                         </div>
                         <div class="review-sub">
                             Clasificación: <span class="stars">${'★'.repeat(res.calificacion)}</span>
-                            ${actividad ? ` • ${actividad.titulo}` : ''}
+                            ${actividad ? ` • ${escapeHtml(actividad.titulo)}` : ''}
                         </div>
-                        <p>"${res.comentario || 'Sin comentario.'}"</p>
+                        <p>"${escapeHtml(res.comentario || 'Sin comentario.')}"</p>
                     </div>`;
             }));
 
@@ -624,29 +648,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         // no representan dinero recibido.
         const ingresoDe = (acts) => acts.reduce((s, a) => s + a.ingreso, 0);
 
-        const mismoMes = (iso) => {
+        const mismoMes = (iso, offsetMeses = 0) => {
             if (!iso) return false;
             const f = new Date(iso);
-            return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
+            const objetivo = new Date(ahora.getFullYear(), ahora.getMonth() - offsetMeses, 1);
+            return f.getMonth() === objetivo.getMonth() && f.getFullYear() === objetivo.getFullYear();
         };
 
         const delMes = completadas.filter(a => mismoMes(a.fecha));
         const futuras = actividadesConDatos.filter(a => !enElPasado(a.fecha));
 
+        // Últimos 4 meses (incluye el actual) para el total y la gráfica.
+        const ultimosMeses = [3, 2, 1, 0].map(offset => {
+            const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - offset, 1);
+            const actividadesDelMes = completadas.filter(a => mismoMes(a.fecha, offset));
+            return {
+                offset,
+                etiqueta: MESES_CORTOS[fecha.getMonth()],
+                ingreso: ingresoDe(actividadesDelMes)
+            };
+        });
+        const totalUltimos4Meses = ultimosMeses.reduce((s, m) => s + m.ingreso, 0);
+
+        // 4 meses previos a esos, para calcular la tendencia (+/-%).
+        const totalPeriodoAnterior = [7, 6, 5, 4].reduce(
+            (s, offset) => s + ingresoDe(completadas.filter(a => mismoMes(a.fecha, offset))), 0
+        );
+        const tendencia = totalPeriodoAnterior > 0
+            ? Math.round(((totalUltimos4Meses - totalPeriodoAnterior) / totalPeriodoAnterior) * 100)
+            : null;
+        const tendenciaTexto = tendencia === null
+            ? 'Sin datos del período anterior'
+            : `${tendencia >= 0 ? '+' : ''}${tendencia}% vs período anterior`;
+
+        document.getElementById('earn-month-label').textContent = MESES_CORTOS[ahora.getMonth()].toUpperCase();
         document.getElementById('earn-month').textContent = dinero(ingresoDe(delMes));
         document.getElementById('earn-month-sub').textContent =
             `${delMes.length} ${delMes.length === 1 ? 'ruta completada' : 'rutas completadas'}`;
-        document.getElementById('earn-total').textContent = dinero(ingresoDe(completadas));
+        document.getElementById('earn-total').textContent = dinero(totalUltimos4Meses);
+        document.getElementById('earn-total-trend').textContent = tendenciaTexto;
         document.getElementById('earn-future').textContent = dinero(ingresoDe(futuras));
         document.getElementById('earn-future-sub').textContent =
             `de ${futuras.length} ${futuras.length === 1 ? 'ruta programada' : 'rutas programadas'}`;
+        document.getElementById('earn-trend').textContent = tendenciaTexto;
+
+        // Gráfica de barras: alturas relativas al mes con más ingresos.
+        const maxIngresoMes = Math.max(1, ...ultimosMeses.map(m => m.ingreso));
+        document.getElementById('earnings-chart').innerHTML = ultimosMeses.map(m => `
+            <div class="earnings-chart-col ${m.offset === 0 ? 'actual' : ''}">
+                <div class="earnings-chart-bar" style="height: ${Math.round((m.ingreso / maxIngresoMes) * 100)}%;"
+                     title="${m.etiqueta}: ${dinero(m.ingreso)}"></div>
+                <span>${m.etiqueta}</span>
+            </div>
+        `).join('');
 
         const contenedorDesglose = document.getElementById('lista-desglose-ganancias');
         contenedorDesglose.innerHTML = futuras.length === 0
             ? '<p style="color:#6B7280;">Sin ingresos programados.</p>'
             : futuras.map(act => `
                 <div class="breakdown-row">
-                    <span class="route-name">🏕️ ${act.titulo} (${formatearFecha(act.fecha)})</span>
+                    <span class="route-name">🏕️ ${escapeHtml(act.titulo)} (${formatearFecha(act.fecha)})</span>
                     <span class="amount">${dinero(act.ingreso)} confirmado</span>
                 </div>
             `).join('');

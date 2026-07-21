@@ -7,8 +7,14 @@ import { obtenerEventoPorId } from './api/eventosService.js';
 import {
     obtenerCupos,
     crearReserva,
-    obtenerExplorador
+    obtenerExplorador,
+    obtenerReservasGuia
 } from './api/reservasService.js';
+
+// Evita que nombres, comentarios, etc. se interpreten como HTML.
+const escapeHtml = (valor) => String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -67,6 +73,78 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // El nombre de quien reseña vive en `usuario`, dos saltos más allá
+    // de la reserva (reserva -> explorador -> usuario). Se cachea porque
+    // varias reseñas pueden ser del mismo cliente.
+    const cacheClientes = new Map();
+    const nombreDeExplorador = async (idExplorador) => {
+        if (cacheClientes.has(idExplorador)) return cacheClientes.get(idExplorador);
+        try {
+            const resExp = await fetch(`${API_BASE}/exploradores/${idExplorador}`);
+            const exp = resExp.ok ? await resExp.json() : null;
+            const resUsuario = exp ? await fetch(`${API_BASE}/usuarios/${exp.idUsuario}`) : null;
+            const usuario = resUsuario && resUsuario.ok ? await resUsuario.json() : null;
+            const nombre = usuario ? usuario.nombre : 'Explorador Horizon';
+            cacheClientes.set(idExplorador, nombre);
+            return nombre;
+        } catch {
+            return 'Explorador Horizon';
+        }
+    };
+
+    // Reseñas de ESTA actividad puntual: se filtran las reservas del guía
+    // de la zona a las que apuntan a este evento, y de esas se toman las
+    // que ya tienen reseña.
+    const cargarResenasRuta = async (idEvento, idGuia) => {
+        if (!idGuia) return [];
+        try {
+            const [reservasDelGuia, resResenas] = await Promise.all([
+                obtenerReservasGuia(idGuia),
+                fetch(`${API_BASE}/resenas`)
+            ]);
+            const resenas = resResenas.ok ? await resResenas.json() : [];
+
+            const exploradorPorReserva = new Map(
+                reservasDelGuia
+                    .filter(r => r.idEvento === idEvento)
+                    .map(r => [r.idReserva, r.idExplorador])
+            );
+
+            const propias = resenas.filter(res => exploradorPorReserva.has(res.idReserva));
+
+            return Promise.all(propias.map(async (res) => ({
+                ...res,
+                cliente: await nombreDeExplorador(exploradorPorReserva.get(res.idReserva))
+            })));
+        } catch {
+            return [];
+        }
+    };
+
+    const bloqueResenas = (resenas) => {
+        const promedio = resenas.length > 0
+            ? (resenas.reduce((s, r) => s + r.calificacion, 0) / resenas.length).toFixed(1)
+            : null;
+
+        return `
+            <div class="seccion-detalle">
+                <h2>Reseñas${promedio ? ` · ⭐ ${promedio} (${resenas.length})` : ''}</h2>
+                ${resenas.length === 0
+                    ? '<p class="descripcion-texto">Todavía no hay reseñas para esta actividad.</p>'
+                    : `<div class="lista-resenas-ruta">${resenas.map(res => `
+                        <div class="resena-card">
+                            <div class="resena-card-header">
+                                <strong>${escapeHtml(res.cliente)}</strong>
+                                <span class="resena-estrellas">${'★'.repeat(res.calificacion)}${'☆'.repeat(5 - res.calificacion)}</span>
+                            </div>
+                            <p class="resena-comentario">${escapeHtml(res.comentario || 'Sin comentario.')}</p>
+                        </div>
+                    `).join('')}</div>`
+                }
+            </div>
+        `;
+    };
+
     const bloqueGuia = (guia) => {
         if (!guia) return '';
 
@@ -109,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // La zona aporta ubicación y dificultad; el guía viene de ella.
             const zona = await cargarZona(ruta.idZona);
             const guia = zona ? await cargarGuia(zona.idGuia) : null;
+            const resenas = zona ? await cargarResenasRuta(rutaId, zona.idGuia) : [];
 
             const ubicacion = zona ? zona.ubicacion : '';
             const dificultad = zona ? (zona.nivelDificultad || '').toLowerCase() : '';
@@ -152,6 +231,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
 
                         ${bloqueGuia(guia)}
+
+                        ${bloqueResenas(resenas)}
                     </div>
 
                     <!-- COLUMNA DERECHA -->

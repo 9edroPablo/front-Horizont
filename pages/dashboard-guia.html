@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/components/header.css">
     <link rel="stylesheet" href="../css/components/authModal.css">
     <link rel="stylesheet" href="../css/dashboard-guia.css">
+    <link rel="stylesheet" href="../css/components/footer.css">
     <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
@@ -122,11 +123,7 @@
                             <p>Puntuación global</p>
                             <span class="stars">★★★★★</span>
                         </div>
-                        <div class="score-bars">
-                            <div class="bar-row"><span>5★</span><div class="bar"><div class="fill" style="width: 92%;"></div></div><span>92%</span></div>
-                            <div class="bar-row"><span>4★</span><div class="bar"><div class="fill" style="width: 6%;"></div></div><span>6%</span></div>
-                            <div class="bar-row"><span>3★</span><div class="bar"><div class="fill" style="width: 2%;"></div></div><span>2%</span></div>
-                        </div>
+                        <div class="score-bars" id="score-bars"></div>
                     </div>
                     <div id="lista-resenas" class="reviews-stack"></div>
                 </div>
@@ -135,14 +132,14 @@
                     <h3>Resumen de Ganancias</h3>
                     <div class="earnings-grid">
                         <div class="earning-stat">
-                            <span class="label">GANADO ESTE MES (OCT)</span>
+                            <span class="label">GANADO ESTE MES (<span id="earn-month-label"></span>)</span>
                             <h2 id="earn-month">$0</h2>
                             <p id="earn-month-sub">0 rutas completadas</p>
                         </div>
                         <div class="earning-stat">
                             <span class="label">TOTAL ÚLTIMOS 4 MESES</span>
                             <h2 id="earn-total">$0</h2>
-                            <p class="green-text">+18% vs período anterior</p>
+                            <p class="green-text" id="earn-total-trend"></p>
                         </div>
                         <div class="earning-stat">
                             <span class="label">PRÓXIMAS GANANCIAS</span>
@@ -150,6 +147,14 @@
                             <p id="earn-future-sub">de 0 rutas programadas</p>
                         </div>
                     </div>
+                    <div class="earnings-chart-box">
+                        <div class="earnings-chart-header">
+                            <h4>Ganancias por mes</h4>
+                            <span class="chart-trend" id="earn-trend"></span>
+                        </div>
+                        <div class="earnings-chart" id="earnings-chart"></div>
+                    </div>
+
                     <h4 style="margin-top: 25px; margin-bottom: 15px;">Desglose por ruta (próximos ingresos)</h4>
                     <div id="lista-desglose-ganancias" class="earnings-breakdown-list"></div>
                 </div>
@@ -157,7 +162,10 @@
         </div>
     </main>
 
+    <div id="componente-footer"></div>
+
     <script type="module" src="../js/components/loadHeader.js"></script>
+    <script type="module" src="../js/components/loadFooter.js"></script>
     <script type="module" src="../js/components/loadAuthModal.js"></script>
     <script type="module" src="../js/dashboard-guia.js"></script>
 </body>

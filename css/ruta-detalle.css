@@ -144,6 +144,42 @@
     align-items: flex-start;
 }
 
+/* ================== RESEÑAS DE LA RUTA ================== */
+.lista-resenas-ruta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.resena-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 20px;
+    background: #FFFFFF;
+}
+
+.resena-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.resena-card-header strong {
+    color: #1F2937;
+}
+
+.resena-estrellas {
+    color: #F59E0B;
+    letter-spacing: 1px;
+}
+
+.resena-comentario {
+    color: #4B5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
 .guia-foto {
     width: 100px;
     height: 100px;

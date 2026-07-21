@@ -142,7 +142,7 @@ export const crearActividadModal = ({ zonas = [], deportes = [], actividadExiste
                             ).join('')}
                         </select>
                     </div>
-                    <div class="am-campo" id="am-campo-zona">
+                    <div class="am-campo ${(editando ? tipoFijo === 'clase' : !tieneZonas) ? 'oculto' : ''}" id="am-campo-zona">
                         <label for="am-zona">Zona</label>
                         <select id="am-zona">
                             ${zonas.map(z =>

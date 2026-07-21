@@ -187,6 +187,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('guide-bio').textContent =
                         guia.descripcion || 'Aún no has escrito tu biografía.';
                     document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
+                    document.getElementById('stat-years-sub').textContent =
+                        guia.especialidad ? `en ${guia.especialidad.toLowerCase()}` : 'como guía';
                     if (guia.fotoUrl) document.getElementById('guide-avatar').src = guia.fotoUrl;
                 } else {
                     alert(resultado.message);
@@ -213,6 +215,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('stat-clients').textContent = clientesUnicos.size.toLocaleString();
         document.getElementById('stat-rating').textContent = promedioTexto;
         document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
+        document.getElementById('stat-years-sub').textContent =
+            guia.especialidad ? `en ${guia.especialidad.toLowerCase()}` : 'como guía';
         document.getElementById('guide-rating-summary').textContent =
             `${promedioTexto} (${actividadesConDatos.length} actividades) • ${clientesUnicos.size} clientes atendidos`;
 

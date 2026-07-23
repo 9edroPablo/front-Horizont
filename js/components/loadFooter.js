@@ -1,3 +1,5 @@
+import { aplicarTraducciones, obtenerIdioma } from '../i18n.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
     const isRoot = !window.location.pathname.includes('/pages/');
     const basePath = isRoot ? '' : '../';
@@ -11,6 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!footerContainer) return;
 
         footerContainer.innerHTML = html;
+        aplicarTraducciones(footerContainer);
 
         const enlaces = footerContainer.querySelectorAll('a[data-href]');
         enlaces.forEach(enlace => {
@@ -50,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         footerContainer.querySelectorAll('a[href="#"]').forEach(enlace => {
             enlace.addEventListener('click', (e) => {
                 e.preventDefault();
-                avisar('Esta sección está en construcción.');
+                avisar(obtenerIdioma() === 'en' ? 'This section is under construction.' : 'Esta sección está en construcción.');
             });
         });
 

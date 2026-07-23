@@ -10,11 +10,13 @@
     <div class="header-container">
         
         <nav class="header-nav">
-            <a data-href="index.html" class="nav-link" id="nav-inicio">Inicio</a>
-            <a data-href="pages/actividades.html" class="nav-link" id="nav-actividades">Actividades</a>
+            <a data-href="index.html" class="nav-link" id="nav-inicio" data-i18n="nav.inicio">Inicio</a>
+            <a data-href="pages/actividades.html" class="nav-link" id="nav-actividades" data-i18n="nav.actividades">Actividades</a>
         </nav>
-        
+
         <div class="header-auth">
+
+            <button class="btn-idioma" type="button" aria-label="Cambiar idioma / Switch language">EN</button>
 
             <div id="logged-out-state">
                 <button class="btn-iniciar-sesion">
@@ -22,7 +24,7 @@
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    Iniciar sesión
+                    <span data-i18n="nav.iniciarSesion">Iniciar sesión</span>
                 </button>
             </div>
 

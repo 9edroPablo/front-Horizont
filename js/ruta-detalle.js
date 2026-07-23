@@ -11,6 +11,7 @@ import {
     obtenerExplorador,
     obtenerReservasGuia
 } from './api/reservasService.js';
+import { t } from './i18n.js';
 
 // Evita que nombres, comentarios, etc. se interpreten como HTML.
 const escapeHtml = (valor) => String(valor ?? '').replace(/[&<>"']/g, (c) => ({
@@ -130,9 +131,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return `
             <div class="seccion-detalle">
-                <h2>Reseñas${promedio ? ` · ⭐ ${promedio} (${resenas.length})` : ''}</h2>
+                <h2><span data-i18n="rutaDetalle.resenas">${t('rutaDetalle.resenas')}</span>${promedio ? ` · ⭐ ${promedio} (${resenas.length})` : ''}</h2>
                 ${resenas.length === 0
-                    ? '<p class="descripcion-texto">Todavía no hay reseñas para esta actividad.</p>'
+                    ? `<p class="descripcion-texto" data-i18n="rutaDetalle.sinResenas">${t('rutaDetalle.sinResenas')}</p>`
                     : `<div class="lista-resenas-ruta">${resenas.map(res => `
                         <div class="resena-card">
                             <div class="resena-card-header">
@@ -155,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return `
             <div class="guia-card-container">
-                <h2>Tu Guía</h2>
+                <h2 data-i18n="rutaDetalle.tuGuia">${t('rutaDetalle.tuGuia')}</h2>
                 <div class="guia-perfil">
                     <img src="${foto}" alt="Foto de ${guia.nombre}" class="guia-foto">
                     <div class="guia-detalles">
@@ -163,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <h3>${guia.nombre}</h3>
                             <span class="badge-verificado">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                Verificado
+                                <span data-i18n="rutaDetalle.verificado">${t('rutaDetalle.verificado')}</span>
                             </span>
                         </div>
                         ${guia.especialidad ? `<p class="guia-experiencia">${guia.especialidad}${guia.experiencia ? ` • ${guia.experiencia}` : ''}</p>` : ''}
@@ -232,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
 
                         <div class="seccion-detalle">
-                            <h2>Sobre esta ruta</h2>
+                            <h2 data-i18n="rutaDetalle.sobreRuta">${t('rutaDetalle.sobreRuta')}</h2>
                             <p class="descripcion-texto">${descripcion}</p>
                         </div>
 
@@ -246,27 +247,27 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="reserva-card">
                             <div class="reserva-precio-contenedor">
                                 <span class="reserva-precio">$${ruta.precio}</span>
-                                <span class="reserva-persona">/ persona</span>
+                                <span class="reserva-persona" data-i18n="rutaDetalle.persona">${t('rutaDetalle.persona')}</span>
                             </div>
 
                             <div class="reserva-detalles">
                                 <div class="reserva-fila">
-                                    <span class="reserva-label">Lugares disponibles</span>
-                                    <span id="cupos-valor" class="texto-gris">Consultando...</span>
+                                    <span class="reserva-label" data-i18n="rutaDetalle.lugaresDisponibles">${t('rutaDetalle.lugaresDisponibles')}</span>
+                                    <span id="cupos-valor" class="texto-gris" data-i18n="rutaDetalle.consultando">${t('rutaDetalle.consultando')}</span>
                                 </div>
                                 <div class="reserva-fila">
-                                    <span class="reserva-label">Cupo del grupo</span>
-                                    <span class="texto-gris">${ruta.capacidad} personas</span>
+                                    <span class="reserva-label" data-i18n="rutaDetalle.cupoGrupo">${t('rutaDetalle.cupoGrupo')}</span>
+                                    <span class="texto-gris">${ruta.capacidad} <span data-i18n="rutaDetalle.personas">${t('rutaDetalle.personas')}</span></span>
                                 </div>
                                 <div class="reserva-fila">
-                                    <span class="reserva-label">Seguro de actividad</span>
-                                    <span class="texto-gris">Incluido</span>
+                                    <span class="reserva-label" data-i18n="rutaDetalle.seguro">${t('rutaDetalle.seguro')}</span>
+                                    <span class="texto-gris" data-i18n="rutaDetalle.incluido">${t('rutaDetalle.incluido')}</span>
                                 </div>
                             </div>
 
-                            <button class="btn-reservar" id="btn-reservar">Reservar ahora</button>
-                            <p class="reserva-nota" id="reserva-nota">
-                                Cancelación gratuita hasta 48h antes
+                            <button class="btn-reservar" id="btn-reservar" data-i18n="rutaDetalle.reservarAhora">${t('rutaDetalle.reservarAhora')}</button>
+                            <p class="reserva-nota" id="reserva-nota" data-i18n="rutaDetalle.cancelacion">
+                                ${t('rutaDetalle.cancelacion')}
                             </p>
                         </div>
                     </div>

@@ -23,6 +23,7 @@ import { editarPerfilGuia } from './components/perfilGuiaModal.js';
 import { crearActividadModal } from './components/actividadModal.js';
 import { verParticipantes } from './components/participantesModal.js';
 import { editarZonaModal } from './components/zonaModal.js';
+import { t } from './i18n.js';
 
 // Evita que nombres, comentarios, etc. se interpreten como HTML.
 const escapeHtml = (valor) => String(valor ?? '').replace(/[&<>"']/g, (c) => ({
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         guia.descripcion || 'Aún no has escrito tu biografía.';
                     document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
                     document.getElementById('stat-years-sub').textContent =
-                        guia.especialidad ? `en ${guia.especialidad.toLowerCase()}` : 'como guía';
+                        guia.especialidad ? `${t('guia.en')} ${guia.especialidad.toLowerCase()}` : t('guia.comoGuia');
                     if (guia.fotoUrl) document.getElementById('guide-avatar').src = guia.fotoUrl;
                 } else {
                     alert(resultado.message);
@@ -216,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('stat-rating').textContent = promedioTexto;
         document.getElementById('stat-years').textContent = guia.experienciaAnios || 0;
         document.getElementById('stat-years-sub').textContent =
-            guia.especialidad ? `en ${guia.especialidad.toLowerCase()}` : 'como guía';
+            guia.especialidad ? `${t('guia.en')} ${guia.especialidad.toLowerCase()}` : t('guia.comoGuia');
         document.getElementById('guide-rating-summary').textContent =
             `${promedioTexto} (${actividadesConDatos.length} actividades) • ${clientesUnicos.size} clientes atendidos`;
 

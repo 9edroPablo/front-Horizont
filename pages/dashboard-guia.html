@@ -37,8 +37,8 @@
                     </div>
                 </div>
                 <div class="identity-actions">
-                    <button class="btn-secondary">Editar perfil público</button>
-                    <button class="btn-secondary" id="btn-cerrar-sesion">Cerrar sesión</button>
+                    <button class="btn-secondary" data-i18n="guia.editarPerfilPublico">Editar perfil público</button>
+                    <button class="btn-secondary" id="btn-cerrar-sesion" data-i18n="guia.cerrarSesion">Cerrar sesión</button>
                 </div>
             </div>
         </div>
@@ -47,22 +47,22 @@
         <div class="stats-row">
             <div class="stat-card">
                 <h3 id="stat-routes">0</h3>
-                <p>Rutas Guiadas</p>
-                <span>completadas</span>
+                <p data-i18n="guia.rutasGuiadas">Rutas Guiadas</p>
+                <span data-i18n="guia.completadas">completadas</span>
             </div>
             <div class="stat-card">
                 <h3 id="stat-clients">0</h3>
-                <p>Clientes Atendidos</p>
-                <span>aventureros</span>
+                <p data-i18n="guia.clientesAtendidos">Clientes Atendidos</p>
+                <span data-i18n="guia.aventureros">aventureros</span>
             </div>
             <div class="stat-card">
                 <h3 id="stat-rating">0</h3>
-                <p>Calificación Promedio</p>
-                <span>sobre 5.0 estrellas</span>
+                <p data-i18n="guia.calificacionPromedio">Calificación Promedio</p>
+                <span data-i18n="guia.sobre5">sobre 5.0 estrellas</span>
             </div>
             <div class="stat-card">
                 <h3 id="stat-years">0</h3>
-                <p>Años de Experiencia</p>
+                <p data-i18n="guia.aniosExperiencia">Años de Experiencia</p>
                 <span id="stat-years-sub">como guía</span>
             </div>
         </div>
@@ -73,14 +73,14 @@
             <aside class="side-panel">
                 <div class="panel-box">
                     <div class="box-header">
-                        <h3>Sobre este guía</h3>
+                        <h3 data-i18n="guia.sobreEsteGuia">Sobre este guía</h3>
                         <button class="btn-icon-edit">✏️</button>
                     </div>
                     <p id="guide-bio"></p>
                 </div>
-                
+
                 <div class="panel-box">
-                    <h3>Certificaciones</h3>
+                    <h3 data-i18n="guia.certificaciones">Certificaciones</h3>
                     <ul class="cert-list" id="guide-certs"></ul>
                 </div>
             </aside>
@@ -88,17 +88,17 @@
             <!-- Columna Derecha dinámica: Sistema de Control por Pestañas -->
             <section class="main-panel">
                 <nav class="tabs-navigation">
-                    <button class="tab-control active" data-tab="tab-rutas">Mis Rutas Activas</button>
-                    <button class="tab-control" data-tab="tab-calendario">Calendario</button>
-                    <button class="tab-control" data-tab="tab-resenas">Reseñas de Clientes</button>
-                    <button class="tab-control" data-tab="tab-ganancias">$ Ganancias</button>
+                    <button class="tab-control active" data-tab="tab-rutas" data-i18n="guia.misRutasActivas">Mis Rutas Activas</button>
+                    <button class="tab-control" data-tab="tab-calendario" data-i18n="guia.calendario">Calendario</button>
+                    <button class="tab-control" data-tab="tab-resenas" data-i18n="guia.resenasClientes">Reseñas de Clientes</button>
+                    <button class="tab-control" data-tab="tab-ganancias" data-i18n="guia.ganancias">$ Ganancias</button>
                 </nav>
 
                 <!-- Contenidos de Pestañas -->
                 <div class="tab-wrapper active" id="tab-rutas">
                     <div class="wrapper-header">
-                        <h3>Próximos Grupos a Guiar</h3>
-                        <button class="btn-add-route">+ Nueva ruta</button>
+                        <h3 data-i18n="guia.proximosGrupos">Próximos Grupos a Guiar</h3>
+                        <button class="btn-add-route" data-i18n="guia.nuevaRuta">+ Nueva ruta</button>
                     </div>
                     <div id="lista-rutas-activas" class="cards-stack"></div>
                 </div>
@@ -120,7 +120,7 @@
                     <div class="reviews-summary-box">
                         <div class="global-score">
                             <h2 id="review-score-big">4.97</h2>
-                            <p>Puntuación global</p>
+                            <p data-i18n="guia.puntuacionGlobal">Puntuación global</p>
                             <span class="stars">★★★★★</span>
                         </div>
                         <div class="score-bars" id="score-bars"></div>
@@ -129,33 +129,33 @@
                 </div>
 
                 <div class="tab-wrapper" id="tab-ganancias">
-                    <h3>Resumen de Ganancias</h3>
+                    <h3 data-i18n="guia.resumenGanancias">Resumen de Ganancias</h3>
                     <div class="earnings-grid">
                         <div class="earning-stat">
-                            <span class="label">GANADO ESTE MES (<span id="earn-month-label"></span>)</span>
+                            <span class="label"><span data-i18n="guia.ganadoEsteMes">GANADO ESTE MES</span> (<span id="earn-month-label"></span>)</span>
                             <h2 id="earn-month">$0</h2>
                             <p id="earn-month-sub">0 rutas completadas</p>
                         </div>
                         <div class="earning-stat">
-                            <span class="label">TOTAL ÚLTIMOS 4 MESES</span>
+                            <span class="label" data-i18n="guia.totalUltimos4Meses">TOTAL ÚLTIMOS 4 MESES</span>
                             <h2 id="earn-total">$0</h2>
                             <p class="green-text" id="earn-total-trend"></p>
                         </div>
                         <div class="earning-stat">
-                            <span class="label">PRÓXIMAS GANANCIAS</span>
+                            <span class="label" data-i18n="guia.proximasGanancias">PRÓXIMAS GANANCIAS</span>
                             <h2 id="earn-future">$0</h2>
                             <p id="earn-future-sub">de 0 rutas programadas</p>
                         </div>
                     </div>
                     <div class="earnings-chart-box">
                         <div class="earnings-chart-header">
-                            <h4>Ganancias por mes</h4>
+                            <h4 data-i18n="guia.gananciasPorMes">Ganancias por mes</h4>
                             <span class="chart-trend" id="earn-trend"></span>
                         </div>
                         <div class="earnings-chart" id="earnings-chart"></div>
                     </div>
 
-                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Desglose por ruta (próximos ingresos)</h4>
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;" data-i18n="guia.desgloseRuta">Desglose por ruta (próximos ingresos)</h4>
                     <div id="lista-desglose-ganancias" class="earnings-breakdown-list"></div>
                 </div>
             </section>
@@ -164,6 +164,7 @@
 
     <div id="componente-footer"></div>
 
+    <script type="module" src="../js/i18n.js"></script>
     <script type="module" src="../js/components/loadHeader.js"></script>
     <script type="module" src="../js/components/loadFooter.js"></script>
     <script type="module" src="../js/components/loadAuthModal.js"></script>

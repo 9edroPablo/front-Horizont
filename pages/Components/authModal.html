@@ -14,19 +14,19 @@
             </div>
             
             <div class="header-text" id="header-text-login">
-                <h2>Bienvenido de vuelta</h2>
-                <p>La montaña te espera. Ingresa para continuar.</p>
+                <h2 data-i18n="auth.bienvenido.titulo">Bienvenido de vuelta</h2>
+                <p data-i18n="auth.bienvenido.sub">La montaña te espera. Ingresa para continuar.</p>
             </div>
             <div class="header-text hidden" id="header-text-register">
-                <h2>Únete a la comunidad</h2>
-                <p>Regístrate gratis y comienza tu aventura hoy.</p>
+                <h2 data-i18n="auth.unete.titulo">Únete a la comunidad</h2>
+                <p data-i18n="auth.unete.sub">Regístrate gratis y comienza tu aventura hoy.</p>
             </div>
         </div>
 
         <div class="auth-body">
             <div class="auth-tabs-container">
-                <button id="tab-login" class="pill-btn active">Iniciar Sesión</button>
-                <button id="tab-register" class="pill-btn">Registrarse</button>
+                <button id="tab-login" class="pill-btn active" data-i18n="auth.tabLogin">Iniciar Sesión</button>
+                <button id="tab-register" class="pill-btn" data-i18n="auth.tabRegistro">Registrarse</button>
             </div>
 
             <form id="form-login" class="auth-form" novalidate>
@@ -34,26 +34,26 @@
                     <input type="email" id="login-email" placeholder="tu@correo.com" class="form-input">
                 </div>
                 <div class="input-group password-group">
-                    <input type="password" id="login-password" placeholder="Contraseña" class="form-input">
+                    <input type="password" id="login-password" placeholder="Contraseña" class="form-input" data-i18n-placeholder="auth.contrasena.placeholder">
                     <span class="password-icon">👁️</span>
                 </div>
-                
+
                 <div class="forgot-password">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
+                    <a href="#" data-i18n="auth.olvidasteContrasena">¿Olvidaste tu contraseña?</a>
                 </div>
-                
-                <button type="submit" class="btn-submit">Entrar a Horizon</button>
+
+                <button type="submit" class="btn-submit" data-i18n="auth.entrar">Entrar a Horizon</button>
             </form>
 
             <form id="form-register" class="auth-form hidden" novalidate>
                 <div class="input-group">
-                    <input type="text" id="register-name" placeholder="Nombre completo" class="form-input">
+                    <input type="text" id="register-name" placeholder="Nombre completo" class="form-input" data-i18n-placeholder="auth.nombreCompleto.placeholder">
                 </div>
                 <div class="input-group">
                     <input type="email" id="register-email" placeholder="tu@correo.com" class="form-input">
                 </div>
                 <div class="input-group password-group">
-                    <input type="password" id="register-password" placeholder="Contraseña" class="form-input">
+                    <input type="password" id="register-password" placeholder="Contraseña" class="form-input" data-i18n-placeholder="auth.contrasena.placeholder">
                     <span class="password-icon">👁️</span>
                 </div>
 
@@ -61,26 +61,26 @@
                 <div class="input-group rol-selector">
                     <label class="rol-opcion activa">
                         <input type="radio" name="tipo-cuenta" value="explorador" checked>
-                        <span class="rol-titulo">Explorador</span>
-                        <span class="rol-desc">Quiero reservar actividades</span>
+                        <span class="rol-titulo" data-i18n="auth.explorador">Explorador</span>
+                        <span class="rol-desc" data-i18n="auth.exploradorDesc">Quiero reservar actividades</span>
                     </label>
                     <label class="rol-opcion">
                         <input type="radio" name="tipo-cuenta" value="guia">
-                        <span class="rol-titulo">Guía</span>
-                        <span class="rol-desc">Quiero ofrecer mis rutas</span>
+                        <span class="rol-titulo" data-i18n="auth.guia">Guía</span>
+                        <span class="rol-desc" data-i18n="auth.guiaDesc">Quiero ofrecer mis rutas</span>
                     </label>
                 </div>
 
-                <button type="submit" class="btn-submit">Crear mi cuenta</button>
+                <button type="submit" class="btn-submit" data-i18n="auth.crearCuenta">Crear mi cuenta</button>
             </form>
 
             <div class="auth-footer">
                 <div class="divider">
-                    <span>O CONTINÚA CON</span>
+                    <span data-i18n="auth.oContinuaCon">O CONTINÚA CON</span>
                 </div>
                 <button class="btn-google">
                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" width="18">
-                    Continuar con Google
+                    <span data-i18n="auth.continuarGoogle">Continuar con Google</span>
                 </button>
             </div>
         </div>

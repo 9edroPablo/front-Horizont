@@ -109,28 +109,28 @@
     
     <main class="actividades-container">
         <div class="actividades-header">
-            <h1>Explorar Rutas</h1>
-            <p>9 aventuras verificadas. Filtra por deporte, dificultad o destino y encuentra tu próxima ruta.</p>
-            
+            <h1 data-i18n="actividades.titulo">Explorar Rutas</h1>
+            <p data-i18n="actividades.descripcion">9 aventuras verificadas. Filtra por deporte, dificultad o destino y encuentra tu próxima ruta.</p>
+
             <div class="buscador-wrap">
-                <input type="text" id="input-buscar" placeholder="Buscar por nombre o destino...">
+                <input type="text" id="input-buscar" placeholder="Buscar por nombre o destino..." data-i18n-placeholder="actividades.buscar.placeholder">
             </div>
 
             <div class="panel-filtros" id="panel-filtros">
                 <div class="panel-filtros-grupo">
-                    <h4>DEPORTE</h4>
-                    <label><input type="checkbox" class="chk-deporte" value="Senderismo" checked> Senderismo</label>
-                    <label><input type="checkbox" class="chk-deporte" value="Kayak" checked> Kayak</label>
-                    <label><input type="checkbox" class="chk-deporte" value="Escalada" checked> Escalada</label>
-                    <label><input type="checkbox" class="chk-deporte" value="Pesca" checked> Pesca</label>
+                    <h4 data-i18n="actividades.deporte">DEPORTE</h4>
+                    <label><input type="checkbox" class="chk-deporte" value="Senderismo" checked> <span data-i18n="deporte.senderismo">Senderismo</span></label>
+                    <label><input type="checkbox" class="chk-deporte" value="Kayak" checked> <span data-i18n="deporte.kayak">Kayak</span></label>
+                    <label><input type="checkbox" class="chk-deporte" value="Escalada" checked> <span data-i18n="deporte.escalada">Escalada</span></label>
+                    <label><input type="checkbox" class="chk-deporte" value="Pesca" checked> <span data-i18n="deporte.pesca">Pesca</span></label>
                 </div>
                 <div class="panel-filtros-grupo">
-                    <h4>DIFICULTAD</h4>
+                    <h4 data-i18n="actividades.dificultad">DIFICULTAD</h4>
                     <div class="grupo-dificultad">
-                        <button class="btn-dif-actividades active" data-dificultad="todos">Todos</button>
-                        <button class="btn-dif-actividades" data-dificultad="facil">Fácil</button>
-                        <button class="btn-dif-actividades" data-dificultad="medio">Medio</button>
-                        <button class="btn-dif-actividades" data-dificultad="dificil">Difícil</button>
+                        <button class="btn-dif-actividades active" data-dificultad="todos" data-i18n="mapa.dif.todos">Todos</button>
+                        <button class="btn-dif-actividades" data-dificultad="facil" data-i18n="mapa.dif.facil">Fácil</button>
+                        <button class="btn-dif-actividades" data-dificultad="medio" data-i18n="mapa.dif.medio">Medio</button>
+                        <button class="btn-dif-actividades" data-dificultad="dificil" data-i18n="mapa.dif.dificil">Difícil</button>
                     </div>
                 </div>
             </div>
@@ -146,6 +146,8 @@
 
     <!-- 2. AÑADIDO: Contenedor vacío para el Modal -->
     <div id="componente-auth-modal"></div>
+
+    <script type="module" src="../js/i18n.js"></script>
 
     <!-- Script de Header -->
     <script type="module" src="../js/components/loadHeader.js"></script>

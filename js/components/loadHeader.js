@@ -1,3 +1,5 @@
+import { aplicarTraducciones } from '../i18n.js';
+
 document.addEventListener("DOMContentLoaded", async () => {
     const isRoot = !window.location.pathname.includes('/pages/');
     const basePath = isRoot ? '' : '../';
@@ -11,6 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (headerContainer) {
             headerContainer.innerHTML = html;
         }
+
+        aplicarTraducciones(headerContainer);
 
         const enlaces = headerContainer.querySelectorAll('a[data-href]');
         enlaces.forEach(enlace => {

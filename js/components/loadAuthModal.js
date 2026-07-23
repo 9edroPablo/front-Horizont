@@ -3,6 +3,7 @@ import { esEmailValido, mostrarError, limpiarError } from '../utils/validators.j
 
 // Servicio que habla con el backend
 import { loginUser, registrarUser } from '../api/authService.js';
+import { aplicarTraducciones } from '../i18n.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     const isRoot = !window.location.pathname.includes('/pages/');
@@ -17,6 +18,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (modalContainer) {
             modalContainer.innerHTML = html;
         }
+
+        aplicarTraducciones(modalContainer);
 
         // === LÓGICA DE INTERACCIÓN DEL MODAL ===
         const authOverlay = document.getElementById('auth-modal-overlay');
